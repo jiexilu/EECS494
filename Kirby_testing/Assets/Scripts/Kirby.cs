@@ -7,6 +7,8 @@ public class Kirby : MonoBehaviour {
 	private bool is_floating; 
 	public bool has_enemy;
 	public bool inflated;
+	public power_type power;
+	private power_type enemy_power;
 
 	// Use this for initialization
 	void Start () {
@@ -14,6 +16,8 @@ public class Kirby : MonoBehaviour {
 		is_floating = false;
 		has_enemy = false;
 		inflated = false;
+		power = power_type.none;
+		enemy_power = power_type.none;
 	}
 	
 	// Update is called once per frame
@@ -49,8 +53,37 @@ public class Kirby : MonoBehaviour {
 		// down input
 		if (Input.GetKey(KeyCode.DownArrow) && !is_floating)
 		{
-			// duck!
-			print ("duck!");
+			//if he has power take the power and get unfat
+			if(has_enemy){
+				print ("has power" + enemy_power);
+				switch(enemy_power){
+					case power_type.none: 
+						print ("NOTHING");
+						power = power_type.none;
+						break;
+					case power_type.beam:
+						print ("BEAM");
+						power = power_type.beam;
+						break;
+					case power_type.fire:
+						power = power_type.fire;
+						print ("FIRE");
+						break;
+					case power_type.spark:
+						power = power_type.spark;
+						print ("SPARK");
+						break;
+					default:
+						print ("crap");
+						break;
+				}
+				enemy_power = power_type.none;
+				has_enemy = false;
+			}
+			else{
+				// duck!
+				print ("duck!");
+			}
 		}
 		// a input
 		if (Input.GetKey(KeyCode.A)) 
@@ -75,7 +108,7 @@ public class Kirby : MonoBehaviour {
 			} else {
 				// suck in air
 				inflated = true;
-				print ("suck in air");
+//				print ("suck in air");
 			}
 		}
 		// combination input
@@ -88,7 +121,6 @@ public class Kirby : MonoBehaviour {
 			print ("Kirby collided");
 		}
 		if (col.gameObject.tag == "Ground") {
-			// GameObject thePE_Obj = GameObject.Find ("PE_Obj");
 			PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
 			my_obj.acc = Vector3.zero; 
 			my_obj.vel = Vector3.zero; 
@@ -96,10 +128,18 @@ public class Kirby : MonoBehaviour {
 			print ("Kirby hit ground");
 		}
 		if (col.gameObject.tag == "Enemy") {
+			Enemy_1 enemy = col.gameObject.GetComponent<Enemy_1>();
+			if (enemy == null){
+				print ("darn");
+			}
+			if(enemy.power != power_type.none && Input.GetKey(KeyCode.B)){
+				print("enemy sucked in");
+				enemy_power = enemy.power;
+				has_enemy = true;
+			}
 			print ("ENEMY GONE!");
 			col.gameObject.SetActive(false);
 			col.gameObject.renderer.enabled = false;
-			//Destroy (col.gameObject);
 		}
 	}
 

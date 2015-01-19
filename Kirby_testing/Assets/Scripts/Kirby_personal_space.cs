@@ -27,8 +27,8 @@ public class Kirby_personal_space : MonoBehaviour {
 	void OnTriggerStay(Collider col){
 		if (col.gameObject.name != "Kirby") {
 			if (Input.GetKey(KeyCode.B)) {
-				if (col.gameObject.name == "Enemy_1") {
-					print ("suck in enemy");
+				if (col.gameObject.tag == "Enemy") {
+					//print ("suck in enemy");
 
 					MoveObjectTowardsKirby(col);
 				}

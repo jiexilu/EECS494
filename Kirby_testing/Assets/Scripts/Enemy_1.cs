@@ -1,11 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum power_type{
+	none, spark, beam, fire
+}
+
 public class Enemy_1 : MonoBehaviour {
+
+	public power_type power;
 
 	// Use this for initialization
 	void Start () {
-	
+		
 	}
 	
 	// Update is called once per frame
