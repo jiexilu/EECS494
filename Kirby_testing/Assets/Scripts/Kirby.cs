@@ -5,11 +5,15 @@ public class Kirby : MonoBehaviour {
 	
 	public float speed = 5f;
 	private bool is_floating; 
+	public bool has_enemy;
+	public bool inflated;
 
 	// Use this for initialization
 	void Start () {
 		// Destroy (rigidbody);
 		is_floating = false;
+		has_enemy = false;
+		inflated = false;
 	}
 	
 	// Update is called once per frame
@@ -36,6 +40,7 @@ public class Kirby : MonoBehaviour {
 				PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
 				my_obj.reached_ground = false; 
 			} else {
+				inflated = true;
 				is_floating = true;
 				// put sucking in air to float animation in here
 				print ("is_floating is true");
@@ -64,9 +69,12 @@ public class Kirby : MonoBehaviour {
 			if (is_floating) {
 				// release air
 				is_floating = false;
+				has_enemy = false;
+				inflated = false;
 				print ("release air. is_floating is false");
 			} else {
 				// suck in air
+				inflated = true;
 				print ("suck in air");
 			}
 		}
@@ -76,8 +84,10 @@ public class Kirby : MonoBehaviour {
 
 	void OnTriggerEnter(Collider col) {
 		// When Kirby collides with something
-		print ("Kirby collided");
-		if (col.gameObject.name == "Ground") {
+		if (col.gameObject.name != "Kirby_personal_space") {
+			print ("Kirby collided");
+		}
+		if (col.gameObject.tag == "Ground") {
 			// GameObject thePE_Obj = GameObject.Find ("PE_Obj");
 			PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
 			my_obj.acc = Vector3.zero; 
@@ -85,6 +95,16 @@ public class Kirby : MonoBehaviour {
 			my_obj.reached_ground = true; 
 			print ("Kirby hit ground");
 		}
+		if (col.gameObject.tag == "Enemy") {
+			print ("ENEMY GONE!");
+			col.gameObject.SetActive(false);
+			col.gameObject.renderer.enabled = false;
+			//Destroy (col.gameObject);
+		}
 	}
 
+	void OnTriggerExit(Collider col){
+		PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
+		my_obj.reached_ground = false;
+	}
 }

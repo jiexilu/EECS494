@@ -1,11 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Ground.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Ground.cs">
     <Files>
-      <File FileName="Assets/Ground.cs" Line="14" Column="11" />
-      <File FileName="Assets/Kirby.cs" Line="52" Column="15" />
-      <File FileName="Assets/PE_Obj.cs" Line="126" Column="3" />
-      <File FileName="Assets/PhysEngine.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Ground.cs" Line="9" Column="1" />
+      <File FileName="Assets/Scripts/Ground_children.cs" Line="9" Column="26" />
+      <File FileName="Assets/Scripts/Camera_follow.cs" Line="14" Column="18" />
+      <File FileName="Assets/Scripts/PhysEngine.cs" Line="32" Column="4" />
+      <File FileName="Assets/Scripts/Hub_follow.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/Kirby_personal_space.cs" Line="42" Column="31" />
+      <File FileName="Assets/Scripts/Wall.cs" Line="25" Column="27" />
+      <File FileName="Assets/Scripts/PE_Obj.cs" Line="89" Column="52" />
+      <File FileName="Assets/Scripts/Enemy_1.cs" Line="27" Column="6" />
+      <File FileName="Assets/Scripts/Kirby.cs" Line="90" Column="37" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

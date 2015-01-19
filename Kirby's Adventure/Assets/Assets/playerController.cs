@@ -4,12 +4,11 @@ using System.Collections;
 public class playerController : MonoBehaviour {
 
 	private Animator animator;
-	public int before;
+	public int before = 0;
 
 	// Use this for initialization
 	void Start () {
 		animator = this.GetComponent<Animator> ();
-		before = 0;
 	}
 	
 	// Update is called once per frame
@@ -17,11 +16,11 @@ public class playerController : MonoBehaviour {
 
 		var horizontal = Input.GetAxis ("Horizontal");
 
-		if (horizontal > 0) {
+		if (Input.GetKey (KeyCode.RightArrow)) {
 			animator.SetInteger("Direction", 2);
 			before = 2;
 		}
-		else if(horizontal < 0) {
+		else if(Input.GetKey (KeyCode.RightArrow)) {
 			animator.SetInteger("Direction", 3);
 			before = 3;
 		}
@@ -32,6 +31,14 @@ public class playerController : MonoBehaviour {
 			}
 			else{
 				animator.SetInteger("Direction", 1);
+			}
+		}
+		else if(Input.GetKey(KeyCode.A)){
+			if(before == 2){
+				animator.SetInteger("Direction", 6);
+			}
+			else if(before == 3){
+				animator.SetInteger ("Direction", 5);
 			}
 		}
 	}
