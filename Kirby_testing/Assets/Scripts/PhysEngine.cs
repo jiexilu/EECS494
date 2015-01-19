@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 
 public enum PE_GravType {
-	none,
+	none, 
 	constant,
-	planetary
+	floating
 }
 
 public enum PE_Collider {
@@ -16,7 +16,8 @@ public enum PE_Collider {
 public class PhysEngine : MonoBehaviour {
 	static public List<PE_Obj>	objs;
 
-	public Vector3		gravity = new Vector3(0,-3f,0);
+	public Vector3		gravity = new Vector3(0,-5f,0);
+	public Vector3		float_grav = new Vector3(0,-2f,0);
 
 	// Use this for initialization
 	void Awake() {
@@ -55,9 +56,12 @@ public class PhysEngine : MonoBehaviour {
 			switch (po.grav) {
 			case PE_GravType.constant:
 				tAcc += gravity;
+				po.vel += tAcc * dt;
+				break;
+			case PE_GravType.floating:
+				po.vel = float_grav; 
 				break;
 			}
-			po.vel += tAcc * dt;
 		}
 
 		// Position
