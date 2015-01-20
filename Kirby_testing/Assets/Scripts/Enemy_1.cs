@@ -46,7 +46,7 @@ public class Enemy_1 : MonoBehaviour {
 			PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
 			my_obj.acc = Vector3.zero; 
 			my_obj.vel = Vector3.zero; 
-			my_obj.reached_ground = true; 
+//			my_obj.reached_ground = true; 
 		}
 	}
 
