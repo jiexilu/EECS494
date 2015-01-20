@@ -7,16 +7,36 @@ public enum power_type{
 
 public class Enemy_1 : MonoBehaviour {
 
+	public Transform kirby;
 	public power_type power;
+	public float 	leftAndRightEdge = 10f;
+	public float	chanceToChangeDirections = 0.02f;
+	public float 	speed = 1f;
 
 	// Use this for initialization
 	void Start () {
-		
+		renderer.enabled = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		//Basic Movement
+		Vector3 pos = transform.position;
+		pos.x += speed * Time.deltaTime;
+		transform.position = pos;
 		
+		//Changing Directions
+		if (pos.x < -leftAndRightEdge) {
+			speed = Mathf.Abs (speed); //Move Right
+		} else if (pos.x > leftAndRightEdge) {
+			speed = -Mathf.Abs (speed); //Move left
+		}
+	}
+
+	void FixedUpdate(){
+		if(Random.value < chanceToChangeDirections){
+			speed *= -1; //Change Direction
+		}
 	}
 
 	void OnTriggerEnter(Collider col){

@@ -4,6 +4,7 @@ using System.Collections;
 public class Kirby_personal_space : MonoBehaviour {
 
 	public Transform target;
+	public Kirby kirby;
 
 	// Use this for initialization
 	void Start () {
@@ -28,9 +29,32 @@ public class Kirby_personal_space : MonoBehaviour {
 		if (col.gameObject.name != "Kirby") {
 			if (Input.GetKey(KeyCode.B)) {
 				if (col.gameObject.tag == "Enemy") {
-					//print ("suck in enemy");
-
-					MoveObjectTowardsKirby(col);
+					kirby.near_enemy = true;
+					if(kirby.power == power_type.none && kirby.is_floating == false && kirby.has_enemy == false){
+						MoveObjectTowardsKirby(col);
+					}
+					//hit it
+					else{
+						if(kirby.has_enemy){
+							//shoot star out of mouth
+							print ("shoot star");
+							kirby.near_enemy = false;
+							kirby.has_enemy = false;
+						}
+						else if(kirby.is_floating){
+							//shoot puff ball
+							print ("shoot puff ball");
+							kirby.near_enemy = false;
+						}
+						else if(kirby.power != power_type.none){
+							//attack
+							print ("use special attack");
+							kirby.near_enemy = false;
+						}
+						print ("ENEMY GONE!");
+						col.gameObject.SetActive(false);
+						col.gameObject.renderer.enabled = false;
+					}
 				}
 			}
 		}
