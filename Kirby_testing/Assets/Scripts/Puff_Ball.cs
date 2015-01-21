@@ -8,18 +8,14 @@ public class Puff_Ball : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		distance = transform.position.x + 10f;
+		distance = transform.position.x + 2f;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-//		transform.Translate (transform.position.x + 10, transform.position.y, transform.position.z);
-		if (transform.position.x < distance) {
-			Destroy (this.gameObject);		
-			//Get a ref to the appliePicker component of the main camera
-//			ApplePicker apScript = Camera.main.GetComponent<ApplePicker>();
-//			//Call the public AppleDestroyed() method of apscript
-//			apScript.AppleDestroyed();
+		transform.Translate (Time.deltaTime * 6, 0, 0);
+		if (transform.position.x > distance) {
+			Destroy (this.gameObject);	
 		}
 	
 	}

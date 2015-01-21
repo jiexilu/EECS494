@@ -146,7 +146,7 @@ public class Kirby : MonoBehaviour {
 				prev_button = Buttons.a; 
 		}
 		// b input 
-		else if (Input.GetKey (KeyCode.Z) || Input.GetKey (KeyCode.Comma)) {
+		else if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
 				if (is_floating) {
 						// release air
 						is_floating = false;
