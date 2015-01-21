@@ -40,7 +40,7 @@ public class Enemy_1 : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider col){
-		print ("bumped the enemy");
+//		print ("bumped the enemy");
 		if (col.gameObject.name == "Ground") {
 			// GameObject thePE_Obj = GameObject.Find ("PE_Obj");
 			PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();

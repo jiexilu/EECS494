@@ -27,7 +27,7 @@ public class Kirby_personal_space : MonoBehaviour {
 	//Something is within Kirby's boundary
 	void OnTriggerStay(Collider col){
 		if (col.gameObject.name != "Kirby") {
-			if (Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.Comma)) {
+			if (Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.Comma)) {
 				if (col.gameObject.tag == "Enemy") {
 					kirby.near_enemy = true;
 					if(kirby.power == power_type.none && kirby.is_floating == false && kirby.has_enemy == false){

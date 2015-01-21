@@ -83,7 +83,7 @@ public class Kirby : MonoBehaviour {
 				prev_button = Buttons.up; 
 		}
 		// down input
-		else if ((Input.GetKey (KeyCode.DownArrow) || Input.GetKey (KeyCode.S)) && !is_floating) {
+		else if ((Input.GetKeyDown (KeyCode.DownArrow) || Input.GetKeyDown (KeyCode.S)) && !is_floating) {
 				//if he has power take the power and get unfat
 				if (has_enemy) {
 						print ("has power" + enemy_power);
@@ -158,19 +158,18 @@ public class Kirby : MonoBehaviour {
 				} else if (has_enemy) {
 						sprite_kirby.SetInteger ("Action", 16);
 				} else {
-						if (near_enemy == false) {
-								if (power == power_type.none) {
-										// suck in air
-										print ("suck in air");
-										is_floating = true;
-										if (previous_direction == Buttons.right) {
-												sprite_kirby.SetInteger ("Action", 14);
-										}
-								} else {
-										has_enemy = false;
-										print ("shoot power");
-								}
-						}
+					if (near_enemy == false) {
+							if (power == power_type.none) {
+									// suck in air
+									print ("suck in air");
+									if (previous_direction == Buttons.right) {
+											sprite_kirby.SetInteger ("Action", 14);
+									}
+							} else {
+									has_enemy = false;
+									print ("shoot power");
+							}
+					}
 				}
 				prev_button = Buttons.b; 
 		} 
@@ -229,7 +228,7 @@ public class Kirby : MonoBehaviour {
 			if (enemy == null){
 				print ("darn");
 			}
-			if(enemy.power != power_type.none && Input.GetKey(KeyCode.B)){
+			if(enemy.power != power_type.none && (Input.GetKey (KeyCode.Z) || Input.GetKey (KeyCode.Comma))){
 				print("enemy sucked in");
 				enemy_power = enemy.power;
 				has_enemy = true;
