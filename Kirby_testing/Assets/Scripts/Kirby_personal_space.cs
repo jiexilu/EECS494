@@ -5,10 +5,12 @@ public class Kirby_personal_space : MonoBehaviour {
 
 	public Transform target;
 	public Kirby kirby;
+	public bool on_right;
 
 	// Use this for initialization
 	void Start () {
 		renderer.enabled = false;
+		on_right = true;
 	}
 	
 	// Update is called once per frame
@@ -23,10 +25,11 @@ public class Kirby_personal_space : MonoBehaviour {
 				print ("bumped personal_space");
 		}
 	}
-
+	//TODO: modify to work with different sides of kirby
 	//Something is within Kirby's boundary
 	void OnTriggerStay(Collider col){
-		if (col.gameObject.name != "Kirby") {
+		if (col.gameObject.tag == "Enemy") {
+			kirby.near_enemy = true;
 			if (Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.Comma)) {
 				if (col.gameObject.tag == "Enemy") {
 					kirby.near_enemy = true;
@@ -51,9 +54,6 @@ public class Kirby_personal_space : MonoBehaviour {
 							print ("use special attack");
 							kirby.near_enemy = false;
 						}
-						print ("ENEMY GONE!");
-						col.gameObject.SetActive(false);
-						col.gameObject.renderer.enabled = false;
 					}
 				}
 			}
@@ -61,16 +61,18 @@ public class Kirby_personal_space : MonoBehaviour {
 	}
 
 	void MoveObjectTowardsKirby(Collider col){
-		float speed = 3f;
 		Vector3 kirbyPosition = transform.position; 
 		Vector3 targetPosition = col.gameObject.transform.position;
 		Vector3 moveTowardsPosition = kirbyPosition - targetPosition;
-		moveTowardsPosition.Normalize();
-
-		col.gameObject.transform.Translate(
-			(moveTowardsPosition.x * speed * Time.deltaTime),
-			(moveTowardsPosition.y * speed * Time.deltaTime),
-			(moveTowardsPosition.z * speed * Time.deltaTime),
-			Space.World);
+		float speed = 3f;
+		if((moveTowardsPosition.x < 0 && kirby.previous_direction == Buttons.right) ||
+		   (moveTowardsPosition.x > 0 && kirby.previous_direction == Buttons.left)) {
+			moveTowardsPosition.Normalize();
+			col.gameObject.transform.Translate(
+				(moveTowardsPosition.x * speed * Time.deltaTime),
+				(moveTowardsPosition.y * speed * Time.deltaTime),
+				(moveTowardsPosition.z * speed * Time.deltaTime),
+				Space.World);
+		}
 	}
 }

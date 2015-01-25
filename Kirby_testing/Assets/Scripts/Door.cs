@@ -25,6 +25,7 @@ public class Door : MonoBehaviour {
 				Vector3 cam_location = start;
 				cam_location.y = -10.33f;
 				cam_location.z = main_camera.transform.position.z;
+				cam_location.x = -5.067625f;
 				main_camera.transform.position = cam_location;
 			}
 		}
