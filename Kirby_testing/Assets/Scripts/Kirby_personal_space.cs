@@ -64,7 +64,7 @@ public class Kirby_personal_space : MonoBehaviour {
 		Vector3 kirbyPosition = transform.position; 
 		Vector3 targetPosition = col.gameObject.transform.position;
 		Vector3 moveTowardsPosition = kirbyPosition - targetPosition;
-		float speed = 3f;
+		float speed = 4f;
 		if((moveTowardsPosition.x < 0 && kirby.previous_direction == Buttons.right) ||
 		   (moveTowardsPosition.x > 0 && kirby.previous_direction == Buttons.left)) {
 			moveTowardsPosition.Normalize();

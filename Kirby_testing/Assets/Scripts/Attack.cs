@@ -11,6 +11,7 @@ public class Attack : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
+		transform.position = kirby.transform.position;
 		distance = go_right ? transform.position.x + 2f : transform.position.x - 2f;
 	}
 	
@@ -22,7 +23,7 @@ public class Attack : MonoBehaviour {
 	}
 	
 	void shoot(){
-		if (power != power_type.spark) {
+		if (power == power_type.none || power == power_type.fire) {
 			if (go_right) {
 				transform.Translate (Time.deltaTime * 6, 0, 0);
 				if (transform.position.x > distance) {
@@ -35,11 +36,15 @@ public class Attack : MonoBehaviour {
 				}
 			}
 		}
+		if (power == power_type.beam) {
+			print ("use beam");
+			transform.position = kirby.transform.position;
+			gameObject.transform.Rotate(0, 0, -270 * Time.deltaTime);
+		}
 	}
 	
 	void OnTriggerEnter(Collider col){
 		if (col.tag == "Enemy") {
-			print ("hit the poof ball");
 			col.gameObject.SetActive (false);
 			Destroy (this.gameObject);
 		}

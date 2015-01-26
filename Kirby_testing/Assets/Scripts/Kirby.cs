@@ -15,6 +15,7 @@ public class Kirby : MonoBehaviour {
 
 	public GameObject puffBall_prefab;
 	public GameObject star;
+	public GameObject beam;
 	public Animator sprite_kirby;
 
 	public Vector3 vel;
@@ -325,6 +326,8 @@ public class Kirby : MonoBehaviour {
 				break;
 			case power_type.beam:
 				print ("BEAM");
+				Attack beam_power = beam.GetComponent<Attack>();
+				beam_power.poof = true;
 				break;
 			case power_type.fire:
 				print ("FIRE");
