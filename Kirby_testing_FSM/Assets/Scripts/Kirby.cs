@@ -117,6 +117,7 @@ public class Kirby : MonoBehaviour {
 
 	void state_stand() {
 		horiz_movement();
+		cur_stand = State.stand;
 		if (prev_dir == Direction.right) {
 			sprite_kirby.SetInteger("Action", 0);
 		} else {
@@ -295,12 +296,14 @@ public class Kirby : MonoBehaviour {
 		if (Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.A)) {
 			prev_dir = Direction.left;
 			sprite_kirby.SetInteger ("Action", 21);
-		} else if (Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.D)) {
-			// right input
-			sprite_kirby.SetInteger ("Action", 16);
+		} 
+		// right input
+		if (Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.D)) {
 			prev_dir = Direction.right;
-		} else if (Input.GetKeyDown (KeyCode.DownArrow) || Input.GetKeyDown (KeyCode.S)) {
-			// down input
+			sprite_kirby.SetInteger ("Action", 16);
+		} 
+		// down input
+		if (Input.GetKeyDown (KeyCode.DownArrow) || Input.GetKeyDown (KeyCode.S)) {
 			print ("has power" + enemy_power);
 			switch (enemy_power) {
 			case power_type.none: 
@@ -327,26 +330,51 @@ public class Kirby : MonoBehaviour {
 			has_enemy = false;
 			sprite_kirby.SetInteger ("Action", 0);
 			next_state = State.stand_power; 
-		} else if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
+		} 
+		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
 			next_state = State.shoot;
 		}
 	}
 
 	void state_stand_power() {
-		// he can do everything 
+		horiz_movement();
+		cur_stand = State.stand_power;
 		if (prev_dir == Direction.right) {
-			sprite_kirby.SetInteger("Action", 20);
+			sprite_kirby.SetInteger("Action", 0);
 		} else {
-			sprite_kirby.SetInteger("Action", 20);
+			sprite_kirby.SetInteger("Action", 1);
 		}
-		// b input
+		if (Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.A)) {
+			// left input
+			prev_dir = Direction.left;
+			sprite_kirby.SetInteger ("Action", 3);
+		} 
+		if (Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.D)) {
+			// right input
+			sprite_kirby.SetInteger ("Action", 2);
+			prev_dir = Direction.right;
+		} 
+		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) {
+			// up input
+			next_state = State.inhale; 
+		} 
+		if (Input.GetKeyDown (KeyCode.DownArrow) || Input.GetKeyDown (KeyCode.S)) {
+			// down input
+			next_state = State.duck;
+		} 
+		if ((Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Period)) && increase_jump) {
+			// a input
+			next_state = State.jump; 
+		} 
 		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
+			// b input
 			next_state = State.use_power;
 		}
 		// select
 		if (Input.GetKey (KeyCode.Tab)) {
 			has_enemy = false;
 			power = power_type.none;
+			next_state = State.stand;
 			print ("release power");
 		}
 	}
