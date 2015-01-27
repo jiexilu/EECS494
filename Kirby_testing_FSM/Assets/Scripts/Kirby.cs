@@ -274,6 +274,22 @@ public class Kirby : MonoBehaviour {
 		} else if (prev_state == State.stand_enemy) {
 			GameObject projectile = Instantiate (star) as GameObject;
 			has_enemy = false; 
+			sprite_kirby.SetInteger ("Action", 18);
+			projectile.transform.position = transform.position;
+			Attack starfire = projectile.GetComponent<Attack>();
+			if (starfire == null) {
+				print ("Puff is null");
+			}
+			if (prev_dir == Direction.right) {
+				print ("puffball goes right");
+				starfire.go_right = true;
+			} 
+			else {
+				print ("puffball goes left");
+				starfire.go_right = false;
+			}
+			starfire.poof= true;
+			next_state = State.stand;
 		}
 	}
 
@@ -281,17 +297,26 @@ public class Kirby : MonoBehaviour {
 		if (prev_dir == Direction.right) {
 			sprite_kirby.SetInteger ("Action", 14);
 		}
+		else if (prev_dir == Direction.left) {
+			sprite_kirby.SetInteger ("Action", 15);
+		}
 		// personal space stuff goes here
 		if (has_enemy) { // If the sucking motion I just did got an enemy
 			next_state = State.stand_enemy;
 		}
-		else if (Input.GetKeyUp (KeyCode.Z) || Input.GetKeyUp (KeyCode.Comma)) {
+		else if (!near_enemy && (Input.GetKeyUp (KeyCode.Z) || Input.GetKeyUp (KeyCode.Comma))) {
 			next_state = State.stand;		
 		}
 	}
 
 	void state_stand_enemy() {
 		horiz_movement();
+		if (prev_dir == Direction.right) {
+			sprite_kirby.SetInteger ("Action", 20);
+		}
+		else if (prev_dir == Direction.left) {
+			sprite_kirby.SetInteger ("Action", 21);
+		}
 		// left input
 		if (Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.A)) {
 			prev_dir = Direction.left;
@@ -371,8 +396,7 @@ public class Kirby : MonoBehaviour {
 			next_state = State.use_power;
 		}
 		// select
-		if (Input.GetKey (KeyCode.Tab)) {
-			has_enemy = false;
+		if (Input.GetKeyDown (KeyCode.Tab)) {
 			power = power_type.none;
 			next_state = State.stand;
 			print ("release power");
@@ -387,6 +411,7 @@ public class Kirby : MonoBehaviour {
 				break;
 			case power_type.beam:
 				print ("BEAM");
+				beam.transform.position = transform.position;
 				Attack beam_power = beam.GetComponent<Attack>();
 				beam_power.poof = true;
 				break;
@@ -447,7 +472,7 @@ public class Kirby : MonoBehaviour {
 			if (enemy == null){
 				print ("darn");
 			}
-			if(enemy.power != power_type.none && (Input.GetKey (KeyCode.Z) || Input.GetKey (KeyCode.Comma))){
+			if(cur_state == State.suck){
 				print("enemy sucked in");
 				enemy_power = enemy.power;
 				has_enemy = true;

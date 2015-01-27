@@ -17,9 +17,10 @@ public class Power : MonoBehaviour {
 			power.SetInteger ("Power", 0);	
 		} else if (kirby.power == power_type.spark) {
 			power.SetInteger ("Power", 1);	
-		}
-		else if (kirby.power == power_type.beam) {
+		} else if (kirby.power == power_type.beam) {
 			power.SetInteger ("Power", 2);	
+		} else if (kirby.power == power_type.fire) {
+			power.SetInteger ("Power", 3);
 		}
 	}
 }

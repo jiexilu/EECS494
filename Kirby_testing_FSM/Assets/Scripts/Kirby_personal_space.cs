@@ -2,12 +2,12 @@
 using System.Collections;
 
 public class Kirby_personal_space : MonoBehaviour {
-
+	
 	public Transform target;
 	public Kirby kirby;
 	public bool on_right;
 	private Collider nearby_enemy;
-
+	
 	// Use this for initialization
 	void Start () {
 		renderer.enabled = false;
@@ -21,33 +21,47 @@ public class Kirby_personal_space : MonoBehaviour {
 		transform.position = tp;
 		if (kirby.near_enemy  && kirby.cur_state == State.suck && kirby.power == power_type.none) {
 			MoveObjectTowardsKirby(nearby_enemy);
-			kirby.near_enemy = false;
-			kirby.has_enemy = true;
 		}
 	}
-
+	
 	void OnTriggerEnter(Collider col) {
-		if (col.gameObject.name != "Kirby") {
-				print ("bumped personal_space");
-		}
-	}
-	//TODO: modify to work with different sides of kirby
-	//Something is within Kirby's boundary
-	void OnTriggerStay(Collider col){
 		if (col.gameObject.tag == "Enemy") {
-			kirby.near_enemy = true;
-			nearby_enemy = col;
+			Vector3 kirbyPosition = transform.position; 
+			Vector3 targetPosition = col.gameObject.transform.position;
+			Vector3 moveTowardsPosition = kirbyPosition - targetPosition;
+			if((moveTowardsPosition.x < 0 && kirby.prev_dir == Direction.right) ||
+			   (moveTowardsPosition.x > 0 && kirby.prev_dir == Direction.left)){
+				kirby.near_enemy = true;
+				nearby_enemy = col;	
+			}
 		}
 	}
-	void OnTriggerLeave(Collider col){
-		kirby.near_enemy = false;
+	
+	void OnTriggerStay(Collider col){
+		//		if (col.gameObject.tag == "Enemy") {
+		//			Vector3 kirbyPosition = transform.position; 
+		//			Vector3 targetPosition = col.gameObject.transform.position;
+		//			Vector3 moveTowardsPosition = kirbyPosition - targetPosition;
+		//			if((moveTowardsPosition.x < 0 && kirby.prev_dir == Direction.right) ||
+		//				(moveTowardsPosition.x > 0 && kirby.prev_dir == Direction.left)){
+		//				kirby.near_enemy = true;
+		//				nearby_enemy = col;	
+		//			}
+		//		}
 	}
-
+	
+	void OnTriggerLeave(Collider col){
+		if (col.gameObject.tag == "Enemy") {
+			kirby.near_enemy = false;
+			nearby_enemy = null;
+		}
+	}
+	
 	void MoveObjectTowardsKirby(Collider col){
 		Vector3 kirbyPosition = transform.position; 
 		Vector3 targetPosition = col.gameObject.transform.position;
 		Vector3 moveTowardsPosition = kirbyPosition - targetPosition;
-		float speed = 4f;
+		float speed = 5f;
 		if((moveTowardsPosition.x < 0 && kirby.prev_dir == Direction.right) ||
 		   (moveTowardsPosition.x > 0 && kirby.prev_dir == Direction.left)) {
 			moveTowardsPosition.Normalize();

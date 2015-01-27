@@ -8,9 +8,12 @@ public class Attack : MonoBehaviour {
 	public bool go_right;
 	public bool poof = false;
 	public power_type power;
+	private float usage;
+	private float delay;
 	
 	// Use this for initialization
 	void Start () {
+		delay = 2;
 		kirby = GetComponent<Kirby> ();
 //		transform.position = kirby.transform.position;
 		distance = go_right ? transform.position.x + 2f : transform.position.x - 2f;
@@ -19,6 +22,7 @@ public class Attack : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (poof) {
+			usage = Time.time + delay;
 			shoot ();		
 		}
 	}
@@ -39,8 +43,10 @@ public class Attack : MonoBehaviour {
 		}
 		if (power == power_type.beam) {
 			print ("use beam");
-			transform.position = kirby.transform.position;
-			gameObject.transform.Rotate(0, 0, -270 * Time.deltaTime);
+			gameObject.transform.Rotate(0, 0, -180 * Time.deltaTime);
+			if(Time.time > usage){
+				Destroy (this.gameObject);
+			}
 		}
 	}
 	
