@@ -11,7 +11,8 @@ public class Attack : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		transform.position = kirby.transform.position;
+		kirby = GetComponent<Kirby> ();
+//		transform.position = kirby.transform.position;
 		distance = go_right ? transform.position.x + 2f : transform.position.x - 2f;
 	}
 	
