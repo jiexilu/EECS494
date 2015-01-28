@@ -23,6 +23,7 @@ public enum State {
 
 public class Kirby : MonoBehaviour {
 
+	public GameObject musicNotes;
 	public GameObject puffBall_prefab;
 	public GameObject star;
 	public GameObject beam;
@@ -52,6 +53,9 @@ public class Kirby : MonoBehaviour {
 	private PE_Obj my_obj;
 	private bool increase_jump = true; 
 	private power_type enemy_power = power_type.none;
+
+	private float usage;
+	private float delay;
 
 	// Use this for initialization
 	void Start () {
@@ -412,6 +416,8 @@ public class Kirby : MonoBehaviour {
 				print ("NOTHING");
 				break;
 			case power_type.beam:
+				delay = 0.5f;
+				usage = Time.time + delay;
 				print ("BEAM");
 				GameObject projectile = Instantiate (beam) as GameObject;
 				beam.transform.position = transform.position;
@@ -425,10 +431,23 @@ public class Kirby : MonoBehaviour {
 			case power_type.spark:
 				print ("SPARK");
 				break;
+			case power_type.sing:
+				print ("SING!");
+				if (prev_dir == Direction.right) {
+					sprite_kirby.SetInteger ("Action", 14);
+				}
+				else if (prev_dir == Direction.left) {
+					sprite_kirby.SetInteger ("Action", 15);
+				}
+				GameObject notes = Instantiate(musicNotes) as GameObject;
+				notes.transform.position = transform.position;
+				Attack sing_power = notes.GetComponent<Attack>();	
+				break;
 			default:
 				print ("crap");
 				break;
 		}
+		//TODO: while attacking, don't change states
 		next_state = State.stand_power;
 	}
 

@@ -52,6 +52,9 @@ public class Attack : MonoBehaviour {
 				Destroy (this.gameObject);
 			}
 		}
+		if (power == power_type.sing) {
+
+		}
 	}
 	
 	void OnTriggerEnter(Collider col){

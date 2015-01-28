@@ -4,6 +4,7 @@ using System.Collections;
 public class music : MonoBehaviour {
 
 	public Kirby kirby;
+
 	// Use this for initialization
 	void Start () {
 	
@@ -15,6 +16,10 @@ public class music : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider col) {
-
+		if (col.tag == "Player") {
+			kirby.power = power_type.sing;
+			kirby.cur_state = State.stand_power;
+			gameObject.SetActive(false);
+		}
 	}
 }

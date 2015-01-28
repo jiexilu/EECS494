@@ -21,6 +21,8 @@ public class Power : MonoBehaviour {
 			power.SetInteger ("Power", 2);	
 		} else if (kirby.power == power_type.fire) {
 			power.SetInteger ("Power", 3);
+		} else if (kirby.power == power_type.sing) {
+			power.SetInteger ("Power", 4);
 		}
 	}
 }
