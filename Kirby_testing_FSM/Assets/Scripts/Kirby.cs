@@ -32,10 +32,16 @@ public class Kirby : MonoBehaviour {
 	public Vector3 vel;
 
 	public float speed = 3f;
+	public float slide_speed = 10f; 
 	public float air_speed = 4f; 
 	public float float_speed = 3f; 
 	public float max_jump_speed = 8f; 
 	public bool reached_ground = false; 
+	public float usage;
+	public float delay;
+	public float slide_delay = 0.5f;
+	public bool set_delay = false; 
+	public float slide_x = 0.5f;
 
 	public bool has_enemy = false;
 	public power_type power = power_type.none;
@@ -53,9 +59,7 @@ public class Kirby : MonoBehaviour {
 	private PE_Obj my_obj;
 	private bool increase_jump = true; 
 	private power_type enemy_power = power_type.none;
-
-	private float usage;
-	private float delay;
+	
 
 	// Use this for initialization
 	void Start () {
@@ -248,11 +252,23 @@ public class Kirby : MonoBehaviour {
 	}
 
 	void state_slide() {
-		if (Input.GetKeyDown (KeyCode.DownArrow) || Input.GetKeyDown (KeyCode.S)) {
-			next_state = State.duck;
+		if (!set_delay) {
+			usage = Time.time + slide_delay;
+			set_delay = true; 
+		}
+		if (Time.time < usage) {
+			// increase velocity in the direction you are facing 
+			// keep increasing until you've reached a certain time
+			float vX = (prev_dir == Direction.right) ? slide_x : -slide_x;
+			vel.x = vX * slide_speed;
 		} else {
-			// go back to previous standing
-			next_state = (cur_state == State.stand) ? State.stand : State.stand_power; 
+			set_delay = false;
+			if (Input.GetKeyDown (KeyCode.DownArrow) || Input.GetKeyDown (KeyCode.S)) {
+				next_state = State.duck;
+			} else {
+				// go back to previous standing
+				next_state = cur_stand; 
+			}
 		}
 	}
 
@@ -500,22 +516,19 @@ public class Kirby : MonoBehaviour {
 				enemy_power = enemy.power;
 				has_enemy = true;
 				print ("ENEMY GONE!");
-				col.gameObject.SetActive(false);
-				near_enemy = false;
 			}
-			else{
+			else if (cur_state != State.slide) {
 				print ("kirby hurt");
 				health--;
-				col.gameObject.SetActive(false);
-				near_enemy = false;
 			}
-
+			col.gameObject.SetActive(false);
+			near_enemy = false;
 		}
 	}
 
 	void OnTriggerExit(Collider col){
 		print ("Kirby exiting collider");
-		PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
+		my_obj = gameObject.GetComponent<PE_Obj> ();
 		if (col.gameObject.tag == "Ground") {
 			my_obj.ground = null;  
 		}
