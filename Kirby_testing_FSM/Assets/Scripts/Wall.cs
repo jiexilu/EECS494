@@ -23,14 +23,14 @@ public class Wall : MonoBehaviour {
 		}
 		else if (tag == "Ceiling" && col.gameObject.tag != "Wall") {
 			pos1 = col.gameObject.transform.position.y;	
-			print ("ceiling collid");
+			//print ("ceiling collid");
 		}
 	}
 
 	void OnTriggerStay(Collider col){
 		Vector3 player = col.gameObject.transform.position;
 		if (tag == "Wall" && col.gameObject.tag != "Ground") {
-			print ("Wall collide");
+			//print ("Wall collide");
 			player.x = pos1;
 			col.gameObject.transform.position = player;
 		}

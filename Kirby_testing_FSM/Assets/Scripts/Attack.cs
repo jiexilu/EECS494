@@ -13,7 +13,8 @@ public class Attack : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		delay = 2;
+		delay = 0.5f;
+		usage = Time.time + delay;
 		kirby = GetComponent<Kirby> ();
 //		transform.position = kirby.transform.position;
 		distance = go_right ? transform.position.x + 2f : transform.position.x - 2f;
@@ -22,7 +23,6 @@ public class Attack : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (poof) {
-			usage = Time.time + delay;
 			shoot ();		
 		}
 	}
@@ -42,8 +42,12 @@ public class Attack : MonoBehaviour {
 			}
 		}
 		if (power == power_type.beam) {
-			print ("use beam");
-			gameObject.transform.Rotate(0, 0, -180 * Time.deltaTime);
+			if(go_right){
+				gameObject.transform.Rotate(0, 0, -180 * Time.deltaTime*2);
+			}
+			else{
+				gameObject.transform.Rotate(0, 0, 180 * Time.deltaTime*2);
+			}
 			if(Time.time > usage){
 				Destroy (this.gameObject);
 			}
@@ -52,9 +56,9 @@ public class Attack : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider col){
 		if (col.tag == "Enemy") {
+			print ("attack");
 			col.gameObject.SetActive (false);
 			Destroy (this.gameObject);
-			kirby.near_enemy = false;
 		}
 	}
 }

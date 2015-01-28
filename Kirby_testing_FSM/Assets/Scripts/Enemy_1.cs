@@ -2,7 +2,7 @@
 using System.Collections;
 
 public enum power_type{
-	none, spark, beam, fire, star
+	none, spark, beam, fire, star, sing
 }
 
 public class Enemy_1 : MonoBehaviour {
@@ -14,6 +14,7 @@ public class Enemy_1 : MonoBehaviour {
 	public float 	speed = .5f;
 	public float spawnTime = 3f; 
 	private float distance;
+	public int score = 400; //points earned for destroying
 
 	// Use this for initialization
 	void Start () {

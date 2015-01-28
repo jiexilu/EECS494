@@ -172,7 +172,7 @@ public class Kirby : MonoBehaviour {
 		}
 		if (reached_ground) {
 			increase_jump = true; 
-			next_state = State.stand;
+			next_state = (cur_stand == State.stand) ? State.stand : State.stand_power;
 		}
 	}
 
@@ -237,9 +237,9 @@ public class Kirby : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
 			// slide
 			next_state = State.slide; 
-		} else if (!(Input.GetKeyDown (KeyCode.DownArrow) || Input.GetKeyDown (KeyCode.S))) {
+		} else if ((Input.GetKeyUp (KeyCode.DownArrow) || Input.GetKeyUp (KeyCode.S))) {
 			// go back to previous standing
-			next_state = State.stand; 
+			next_state = (cur_stand == State.stand ) ? State.stand : State.stand_power; 
 		}
 	}
 
@@ -248,7 +248,7 @@ public class Kirby : MonoBehaviour {
 			next_state = State.duck;
 		} else {
 			// go back to previous standing
-			next_state = State.stand; 
+			next_state = (cur_state == State.stand) ? State.stand : State.stand_power; 
 		}
 	}
 
@@ -270,7 +270,8 @@ public class Kirby : MonoBehaviour {
 				puff.go_right = false;
 			}
 			puff.poof= true;
-			next_state = State.stand;
+			next_state = (cur_stand == State.stand) ? State.stand : State.stand_power;
+
 		} else if (prev_state == State.stand_enemy) {
 			GameObject projectile = Instantiate (star) as GameObject;
 			has_enemy = false; 
@@ -359,6 +360,7 @@ public class Kirby : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
 			next_state = State.shoot;
 		}
+		cur_stand = State.stand_power;
 	}
 
 	void state_stand_power() {
@@ -411,8 +413,10 @@ public class Kirby : MonoBehaviour {
 				break;
 			case power_type.beam:
 				print ("BEAM");
+				GameObject projectile = Instantiate (beam) as GameObject;
 				beam.transform.position = transform.position;
 				Attack beam_power = beam.GetComponent<Attack>();
+				beam_power.go_right = (prev_dir == Direction.right) ? true : false;
 				beam_power.poof = true;
 				break;
 			case power_type.fire:
