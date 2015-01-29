@@ -19,6 +19,7 @@ public class Spawner : MonoBehaviour {
 
 	void OnBecameInvisible(){
 		//can only test this when away from the scene view in unity
+		if (my_enemy == null) return; 
 		print ("spawner out of sight");
 		if (my_enemy.activeSelf == false) {
 			print ("enemy spawn");
