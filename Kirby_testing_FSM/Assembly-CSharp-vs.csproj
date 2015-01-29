@@ -46,7 +46,6 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\MusicBubble.cs" />
      <Compile Include="Assets\Scripts\Attack.cs" />
      <Compile Include="Assets\Scripts\Camera_follow.cs" />
      <Compile Include="Assets\Scripts\Door.cs" />
@@ -58,12 +57,14 @@
      <Compile Include="Assets\Scripts\Kirby.cs" />
      <Compile Include="Assets\Scripts\Kirby_personal_space.cs" />
      <Compile Include="Assets\Scripts\Life.cs" />
+     <Compile Include="Assets\Scripts\MusicBubble.cs" />
      <Compile Include="Assets\Scripts\PE_Obj.cs" />
      <Compile Include="Assets\Scripts\PhysEngine.cs" />
      <Compile Include="Assets\Scripts\Power.cs" />
      <Compile Include="Assets\Scripts\Wall.cs" />
      <Compile Include="Assets\Scripts\door_portal.cs" />
      <Compile Include="Assets\Scripts\music.cs" />
+     <Compile Include="Assets\Spawner.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/4.6.1/UnityEngine.UI.dll</HintPath>
  </Reference>

@@ -20,22 +20,22 @@ public class Camera_follow : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (music_power) {
-				foreach (var enemy in prefabEnemies) {
-						Vector3 point = enemy.transform.position;
-						Ray inCamera = camera.ScreenPointToRay (point);
-						if (Physics.Raycast (inCamera, out rHit)) {
-								print ("go to sleep");
-								PE_Obj enemy_sleep = enemy.GetComponent<PE_Obj> ();
-								enemy_sleep.vel.x = 0;	
-						}	
-				}
-		} else {
-			foreach (var enemy in prefabEnemies) {
-				Vector3 point = enemy.transform.position;
-				PE_Obj enemy_sleep = enemy.GetComponent<PE_Obj> ();
-			}	
-		}
+//		if (music_power) {
+//			foreach (var enemy in prefabEnemies) {
+//				Vector3 point = enemy.transform.position;
+//				Ray inCamera = camera.ScreenPointToRay (point);
+//				if (Physics.Raycast (inCamera, out rHit)) {
+//						print ("go to sleep");
+//						PE_Obj enemy_sleep = enemy.GetComponent<PE_Obj> ();
+//						enemy_sleep.vel.x = 0;	
+//				}	
+//			}
+//		} else {
+//			foreach (var enemy in prefabEnemies) {
+//				Vector3 point = enemy.transform.position;
+//				PE_Obj enemy_sleep = enemy.GetComponent<PE_Obj> ();
+//			}	
+//		}
 
 
 		Vector3 tp = transform.position;

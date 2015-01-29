@@ -345,7 +345,7 @@ public class Kirby : MonoBehaviour {
 		// left input
 		if (Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.A)) {
 			prev_dir = Direction.left;
-			sprite_kirby.SetInteger ("Action", 21);
+			sprite_kirby.SetInteger ("Action", 17);
 		} 
 		// right input
 		if (Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.D)) {
@@ -383,6 +383,10 @@ public class Kirby : MonoBehaviour {
 		} 
 		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
 			next_state = State.shoot;
+		}
+		//TODO: kirby can jump when he has an enemy
+		if (Input.GetKey (KeyCode.X) || Input.GetKey (KeyCode.Period)) {
+			next_state = State.jump;		
 		}
 		cur_stand = State.stand_power;
 	}
@@ -422,7 +426,7 @@ public class Kirby : MonoBehaviour {
 			next_state = State.use_power;
 		}
 		// select
-		if (Input.GetKeyDown (KeyCode.Tab)) {
+		if (Input.GetKeyDown (KeyCode.Tab) && power != power_type.none) {
 			power = power_type.none;
 			next_state = State.stand;
 			print ("release power");
@@ -511,7 +515,7 @@ public class Kirby : MonoBehaviour {
 
 	void OnTriggerEnter(Collider col) {
 		// When Kirby collides with something
-		PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
+//		PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
 
 		if (col.gameObject.name != "Kirby_personal_space") {
 			print ("Kirby collided");

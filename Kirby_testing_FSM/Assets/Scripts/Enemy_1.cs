@@ -16,9 +16,16 @@ public class Enemy_1 : MonoBehaviour {
 	private float distance;
 	public int score = 400; //points earned for destroying
 	public Vector3 startPostion;
+	private float usage;
+	private float delay;
+
+	//powers
+	public GameObject beam_string;
 
 	// Use this for initialization
 	void Start () {
+		delay = 0.5f;
+		usage = Time.time + delay;
 		startPostion = gameObject.transform.position;
 		renderer.enabled = false;
 		distance = Mathf.Abs (kirby.position.x - transform.position.x);
@@ -37,21 +44,11 @@ public class Enemy_1 : MonoBehaviour {
 		} else if (pos.x > leftAndRightEdge) {
 			speed = -Mathf.Abs (speed); //Move left
 		}
-
-		Spawn ();
 		//if kirby is nearby, use attack
-		if (distance < 2) {
+		if (distance < 4) {
 			//go towards kirby and attack
 			Attack (); 
 		}
-	}
-
-	void Spawn(){
-//		float distance = Mathf.Abs (kirby.position.x - transform.position.x);
-//		if (!renderer.enabled && distance > 2f) {
-//				gameObject.transform.position = startPostion;
-//				gameObject.SetActive (true);
-//		}
 	}
 
 	void FixedUpdate(){
@@ -81,6 +78,7 @@ public class Enemy_1 : MonoBehaviour {
 				break;
 			case power_type.beam:
 				print ("ENEMY ATTACKS WITH BEAM");
+				Beam ();
 				break;
 			case power_type.fire:
 				print ("ENEMY ATTACKS WITH FIRE");
@@ -93,5 +91,13 @@ public class Enemy_1 : MonoBehaviour {
 		//call kirby's got_attacked() if he got hit
 		//maybe put it on the projectile
 	}
-		
+
+	void Beam(){
+		GameObject beam = Instantiate (beam_string) as GameObject;
+		beam.transform.position = gameObject.transform.position;
+		beam.transform.Rotate(0, 0, 180 * Time.deltaTime*2);
+		if(Time.time > usage){
+			Destroy (this.gameObject);
+		}
+	}
 }
