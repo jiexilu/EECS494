@@ -15,6 +15,7 @@ public enum State {
 	slide, 
 	shoot, 
 	suck, 
+	stand_water, 
 	stand_enemy, 
 	stand_power,
 	use_power
@@ -32,6 +33,7 @@ public class Kirby : MonoBehaviour {
 	public GameObject beam;
 	public Animator sprite_kirby;
 	public Camera_follow cam;
+	public BoxCollider box;  
 
 	public Vector3 vel;
 
@@ -49,6 +51,9 @@ public class Kirby : MonoBehaviour {
 	public bool set_attack_delay = false;
 	public bool set_paralyzed_delay = false;
 	public float slide_x = 0.5f;
+	public float water_speed = 2f;
+	public float swim_up_speed = 2f;
+	public bool under_water = false; 
 
 	public bool has_enemy = false;
 	public power_type power = power_type.none;
@@ -66,11 +71,15 @@ public class Kirby : MonoBehaviour {
 	private PE_Obj my_obj;
 	private bool increase_jump = true; 
 	private power_type enemy_power = power_type.none;
-	
+	private Vector3 puffed_box_size = new Vector3(1.75f, 1.25f, 1.75f);
+	private Vector3 standing_box_size = new Vector3(1f, 1f, 1f);
+	private Vector3 duck_box_size = new Vector3(1f, 0.5f, 1f);
+	private Vector3 slide_box_size = new Vector3(2f, 1f, 1f);
 
 	// Use this for initialization
 	void Start () {
 		my_obj = GetComponent<PE_Obj> ();
+		box = GetComponent<BoxCollider> ();
 	}
 	
 	// Update is called once per frame
@@ -123,6 +132,9 @@ public class Kirby : MonoBehaviour {
 			case State.use_power:
 				state_use_power();
 				break;
+			case State.stand_water:
+				state_under_water();
+				break;
 		}
 
 		prev_state = cur_state; 
@@ -154,6 +166,7 @@ public class Kirby : MonoBehaviour {
 		} 
 		if (Input.GetKeyDown (KeyCode.DownArrow) || Input.GetKeyDown (KeyCode.S)) {
 			// down input
+			box.size = duck_box_size;
 			next_state = State.duck;
 		} 
 		if ((Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Period)) && increase_jump) {
@@ -190,7 +203,7 @@ public class Kirby : MonoBehaviour {
 		}
 		if (reached_ground) {
 			increase_jump = true; 
-			next_state = (cur_stand == State.stand) ? State.stand : State.stand_power;
+			next_state = cur_stand;
 		}
 	}
 
@@ -205,6 +218,8 @@ public class Kirby : MonoBehaviour {
 			sprite_kirby.SetInteger ("Action", 4);
 			prev_dir = Direction.left;
 		}
+		change_height (0.75f);
+		box.size = puffed_box_size;
 		next_state = State.floating; 
 	}
 
@@ -265,12 +280,16 @@ public class Kirby : MonoBehaviour {
 			next_state = State.slide; 
 		} else if ((Input.GetKeyUp (KeyCode.DownArrow) || Input.GetKeyUp (KeyCode.S))) {
 			// go back to previous standing
-			next_state = (cur_stand == State.stand ) ? State.stand : State.stand_power; 
+			change_height (0.25f);
+			box.size = standing_box_size;
+			next_state = cur_stand; 
 		}
 	}
 
 	void state_slide() {
 		if (!set_delay) {
+			change_height (0.25f);
+			box.size = slide_box_size;
 			usage = Time.time + slide_delay;
 			set_delay = true; 
 		}
@@ -285,6 +304,8 @@ public class Kirby : MonoBehaviour {
 				next_state = State.duck;
 			} else {
 				// go back to previous standing
+				change_height (0.25f);
+				box.size = standing_box_size;
 				next_state = cur_stand; 
 			}
 		}
@@ -308,7 +329,7 @@ public class Kirby : MonoBehaviour {
 				puff.go_right = false;
 			}
 			puff.poof= true;
-			next_state = (cur_stand == State.stand) ? State.stand : State.stand_power;
+			next_state = cur_stand;
 
 		} else if (prev_state == State.stand_enemy) {
 			GameObject projectile = Instantiate (star) as GameObject;
@@ -330,6 +351,7 @@ public class Kirby : MonoBehaviour {
 			starfire.poof= true;
 			next_state = State.stand;
 		}
+		box.size = standing_box_size;
 	}
 
 	void state_suck() {
@@ -341,6 +363,8 @@ public class Kirby : MonoBehaviour {
 		}
 		// personal space stuff goes here
 		if (has_enemy) { // If the sucking motion I just did got an enemy
+			change_height (0.75f);
+			box.size = puffed_box_size;
 			next_state = State.stand_enemy;
 		}
 		else if (!near_enemy && (Input.GetKeyUp (KeyCode.Z) || Input.GetKeyUp (KeyCode.Comma))) {
@@ -349,6 +373,7 @@ public class Kirby : MonoBehaviour {
 	}
 
 	void state_stand_enemy() {
+		cur_stand = State.stand_enemy;
 		horiz_movement();
 		if (prev_dir == Direction.right) {
 			sprite_kirby.SetInteger ("Action", 20);
@@ -393,6 +418,7 @@ public class Kirby : MonoBehaviour {
 			enemy_power = power_type.none;
 			has_enemy = false;
 			sprite_kirby.SetInteger ("Action", 0);
+			box.size = standing_box_size;
 			next_state = State.stand_power; 
 		} 
 		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
@@ -402,7 +428,7 @@ public class Kirby : MonoBehaviour {
 		if (Input.GetKey (KeyCode.X) || Input.GetKey (KeyCode.Period)) {
 			next_state = State.jump;		
 		}
-		cur_stand = State.stand_power;
+		//cur_stand = State.stand_power;
 	}
 
 	void state_stand_power() {
@@ -489,7 +515,7 @@ public class Kirby : MonoBehaviour {
 						break;
 			}
 		
-	}
+		}
 		//TODO: while attacking, don't change states
 		if (Time.time > usage) {
 			cam.music_power = false;
@@ -498,10 +524,42 @@ public class Kirby : MonoBehaviour {
 		}
 	}
 
+	void state_under_water() {
+		my_obj.grav = PE_GravType.none;
+		horiz_movement();
+		if (prev_dir == Direction.right) {
+			sprite_kirby.SetInteger("Action", 0);
+		} else {
+			sprite_kirby.SetInteger("Action", 1);
+		}
+		if (Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.A)) {
+			// left input
+			prev_dir = Direction.left;
+			sprite_kirby.SetInteger ("Action", 3);
+		} 
+		if (Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.D)) {
+			// right input
+			sprite_kirby.SetInteger ("Action", 2);
+			prev_dir = Direction.right;
+		} 
+		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)
+		    || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Period)) {
+			// swim up
+			vel.y = swim_up_speed;
+		} else {
+			decrease_floating();
+		}
+		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
+			// spit out water
+		}
+	}
+
 	// Horizontal movement
 	void horiz_movement() {
 		float vX = Input.GetAxis("Horizontal"); // Returns a number [-1..1]
-		if (vel.y != 0) {
+		if (under_water) {
+			vel.x = vX * water_speed; 
+		} else if (vel.y != 0) {
 			vel.x = vX * air_speed;
 		} else {
 			vel.x = vX * speed;
@@ -527,12 +585,35 @@ public class Kirby : MonoBehaviour {
 		print ("falling with constant acc");
 	}
 
+	void change_height(float increase) {
+		Vector3 temp = transform.position;
+		temp.y += increase; 
+		transform.position = temp;
+	}
+	
+	void float_in_pool(Collider col) {
+		float col_y_lossy = col.transform.lossyScale.y / 2f; 
+		float col_y_up = col.transform.position.y + col_y_lossy;
+		float y_lossy = (transform.lossyScale.y / 2f) * box.size.y; 
+		float y_down = transform.position.y - y_lossy;
+		float dif_y = 0f;
+		//get new position 
+		dif_y = Mathf.Abs (y_down - col_y_up);
+		//set new position 
+		change_height(dif_y);
+		//set velocity to zero
+		vel.y = 0f;
+	}
+
 	void OnTriggerEnter(Collider col) {
 		// When Kirby collides with something
-//		PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
-
-		if (col.gameObject.name != "Kirby_personal_space") {
-			print ("Kirby collided");
+		if (col.gameObject.tag == "Pool" && cur_state != State.floating) {
+			print ("should not float on top of the pool");
+			under_water = true;
+		} else if (col.gameObject.tag == "Pool" && cur_state == State.floating) {
+			print ("should float on top of the pool");
+			// float on top
+			float_in_pool(col);
 		}
 		if (col.gameObject.tag == "Enemy") {
 			print ("Kirby collided");
@@ -564,12 +645,24 @@ public class Kirby : MonoBehaviour {
 			near_enemy = false;
 		}
 	}
+	
+	void onTriggerStay(Collider col) {
+		if (col.gameObject.tag == "Pool" && cur_state == State.floating) {
+			print ("should float on top of the pool");
+			// float on top
+			float_in_pool(col);
+		}
+	}
 
 	void OnTriggerExit(Collider col){
 		print ("Kirby exiting collider");
 		my_obj = gameObject.GetComponent<PE_Obj> ();
 		if (col.gameObject.tag == "Ground") {
 			my_obj.ground = null;  
+		}
+		if (col.gameObject.tag == "Pool") {
+			under_water = false;
+			next_state = cur_stand;
 		}
 	}
 
