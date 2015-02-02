@@ -39,7 +39,13 @@ public class Camera_follow : MonoBehaviour {
 
 
 		Vector3 tp = transform.position;
-		if (target.position.x > -5.14 && target.position.x < 17.11) {
+		tp.x = target.position.x;
+		if (target.position.x < -5.14f) {
+			tp.x = -5.12f;
+		} else if (target.position.x > 17.11f) {
+			tp.x = 17.11f;	
+		}
+		else if (target.position.x > -5.14 && target.position.x < 17.11) {
 			tp.x = target.position.x;
 		}
 		//TODO: change it so it works for each level

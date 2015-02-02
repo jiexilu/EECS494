@@ -11,14 +11,22 @@ public class Spawner : MonoBehaviour {
 		position = gameObject.transform.position;
 		position.z = 7.16f;
 		gameObject.transform.position = position;
+//		my_enemy.gameObject.SetActive (false);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	}
 
+	//initial view
+	void OnBecameVisible(){
+//		my_enemy.gameObject.SetActive (true);
+//		position.z = 0;
+//		my_enemy.transform.position = position;
+	}
+
 	void OnBecameInvisible(){
-		//can only test this when away from the scene view in unity
+//		can only test this when away from the scene view in unity
 		if (my_enemy == null) return; 
 		print ("spawner out of sight");
 		if (my_enemy.activeSelf == false) {
@@ -31,4 +39,5 @@ public class Spawner : MonoBehaviour {
 			my_enemy.SetActive(false);
 		}
 	}
+
 }

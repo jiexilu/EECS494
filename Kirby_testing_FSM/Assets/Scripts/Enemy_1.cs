@@ -2,59 +2,94 @@
 using System.Collections;
 
 public enum power_type{
-	none, spark, beam, fire, star, sing
+	none, spark, beam, fire, star, sing, ouch
 }
 
+public enum enemy_state{
+	wander, chase, attack
+}
+
+//TODO: adjust velocities not their positions
+//TODO: raycasting for going after kirby
 public class Enemy_1 : MonoBehaviour {
 
+	public Animator sprite;
 	public Transform kirby;
 	public power_type power;
-	public float 	leftAndRightEdge = 10f;
-	public float	chanceToChangeDirections = 0.02f;
-	public float 	speed = .5f;
-	public float spawnTime = 3f; 
+	public float 	leftAndRightEdge = 20f;
+	public float 	speed = 7f;
 	private float distance;
 	public int score = 400; //points earned for destroying
-	public Vector3 startPostion;
 	private float usage;
 	private float delay;
+	private Vector3 vel;
+	private PE_Obj my_obj;
+	private RaycastHit hit;
+	private RaycastHit attack_ray;
+	public enemy_state state;
+	public float fieldOfViewRange = 68.0f;
+	private Vector3 rayDir = Vector3.zero;
 
 	//powers
 	public GameObject beam_string;
 
 	// Use this for initialization
 	void Start () {
+		my_obj = GetComponent<PE_Obj> ();
 		delay = 0.5f;
 		usage = Time.time + delay;
-		startPostion = gameObject.transform.position;
 		renderer.enabled = false;
 		distance = Mathf.Abs (kirby.position.x - transform.position.x);
+		state = enemy_state.wander;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		//Basic Movement
-		Vector3 pos = transform.position;
-		pos.x += speed * Time.deltaTime;
-		transform.position = pos;
+		//Basic movement to the right
+		vel = my_obj.vel; 
+//		-------
+		//if they bump something, change directions or jump
+		rayDir = kirby.position - transform.position;
 		
-		//Changing Directions
-		if (pos.x < -leftAndRightEdge) {
-			speed = Mathf.Abs (speed); //Move Right
-		} else if (pos.x > leftAndRightEdge) {
-			speed = -Mathf.Abs (speed); //Move left
+		if (((Vector3.Angle (rayDir, Vector3.left)) < fieldOfViewRange) || 
+		    (Vector3.Angle(rayDir, Vector3.right) < fieldOfViewRange)) {
+			if(Physics.Raycast (transform.position, rayDir, out hit, 200f)){
+				if(hit.transform.tag == "Player"){
+					if(hit.distance < 10f){
+						state = enemy_state.attack;
+					}
+					state = enemy_state.chase;
+				}
+				else{
+					state = enemy_state.wander;
+				}
+			}
 		}
-		//if kirby is nearby, use attack
-		if (distance < 4) {
-			//go towards kirby and attack
-			Attack (); 
+
+		switch (state) {
+			case enemy_state.wander:
+				state_wander();
+				break;
+			case enemy_state.chase:
+				state_chase();
+				break;
+			case enemy_state.attack:
+				Attack();
+				break;
 		}
+
+		if (vel.x < 0) {
+			sprite.SetInteger("Action", 0);	
+		} else {
+			sprite.SetInteger("Action", 1);	
+		}
+		my_obj.vel = vel;
 	}
 
+
+
 	void FixedUpdate(){
-		if(Random.value < chanceToChangeDirections){
-			speed *= -1; //Change Direction
-		}
+
 	}
 
 	void OnTriggerEnter(Collider col){
@@ -78,7 +113,7 @@ public class Enemy_1 : MonoBehaviour {
 				break;
 			case power_type.beam:
 				print ("ENEMY ATTACKS WITH BEAM");
-				Beam ();
+				Beam (); //every 3 seconds 
 				break;
 			case power_type.fire:
 				print ("ENEMY ATTACKS WITH FIRE");
@@ -92,6 +127,29 @@ public class Enemy_1 : MonoBehaviour {
 		//maybe put it on the projectile
 	}
 
+	void state_wander(){
+		print ("wandering enemy");
+
+		if (Physics.Raycast (transform.position, rayDir, out hit, 10f)) {
+
+		}
+
+		switch (power){
+		case power_type.beam:
+			//wander left
+			vel.x = speed;
+
+			break;
+		}
+	}
+	
+	void state_chase(){
+		print ("chasing kirby");
+		Vector3 temp = rayDir;
+		temp.Normalize ();
+		vel.x = temp.x * speed;
+	}
+
 	void Beam(){
 		GameObject beam = Instantiate (beam_string) as GameObject;
 		beam.transform.position = gameObject.transform.position;
@@ -100,4 +158,7 @@ public class Enemy_1 : MonoBehaviour {
 			Destroy (this.gameObject);
 		}
 	}
+
+
+	
 }

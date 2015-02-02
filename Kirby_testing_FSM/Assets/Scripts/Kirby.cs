@@ -23,6 +23,8 @@ public enum State {
 
 public class Kirby : MonoBehaviour {
 
+	public bool God_mode = false;
+	public GameObject kirby_spawner;
 	public GameObject musicNotes;
 	public GameObject musicBubble;
 	public GameObject puffBall_prefab;
@@ -45,6 +47,7 @@ public class Kirby : MonoBehaviour {
 	public float attack_delay = 0.01f;
 	public bool set_delay = false; 
 	public bool set_attack_delay = false;
+	public bool set_paralyzed_delay = false;
 	public float slide_x = 0.5f;
 
 	public bool has_enemy = false;
@@ -176,6 +179,9 @@ public class Kirby : MonoBehaviour {
 				if (prev_dir == Direction.right) {
 					sprite_kirby.SetInteger ("Action", 10);
 				}
+				else{
+					sprite_kirby.SetInteger("Action", 11);
+				}
 			} else {
 				decrease_jump();
 			}
@@ -244,10 +250,18 @@ public class Kirby : MonoBehaviour {
 		print ("duck!");
 		if (prev_dir == Direction.right) {
 			sprite_kirby.SetInteger ("Action", 6);
+		} else if(prev_dir == Direction.left) {
+			sprite_kirby.SetInteger ("Action", 7);
 		}
 		// b input
 		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
 			// slide
+			if(prev_dir == Direction.right){
+				sprite_kirby.SetInteger("Action", 22);
+			}
+			else{
+				sprite_kirby.SetInteger("Action", 23);
+			}
 			next_state = State.slide; 
 		} else if ((Input.GetKeyUp (KeyCode.DownArrow) || Input.GetKeyUp (KeyCode.S))) {
 			// go back to previous standing
@@ -533,8 +547,18 @@ public class Kirby : MonoBehaviour {
 				print ("ENEMY GONE!");
 			}
 			else if (cur_state != State.slide) {
+				if(!set_paralyzed_delay){
+					usage = Time.time + 40f;
+					set_paralyzed_delay = true;
+				}
+				//gets paralyze for a bit in this phase
 				print ("kirby hurt");
-				health--;
+				if(Time.time < usage){
+					power = power_type.ouch;//but for a short time
+				} //TODO: add else somehow
+				power = power_type.none;
+				Got_Attacked(); 
+				//TODO: i want to call got_attaked in enemy_1 script
 			}
 			col.gameObject.SetActive(false);
 			near_enemy = false;
@@ -555,6 +579,11 @@ public class Kirby : MonoBehaviour {
 		if (health == 0 && life > 1) {
 			life--;
 			health = 6;
+			Vector3 temp = kirby_spawner.transform.position;
+			temp.z = 0;
+			transform.position = temp;
+			next_state = State.stand;
+
 		}
 		if (life == 0 && health == 0) {
 			print ("Game over");
@@ -562,4 +591,7 @@ public class Kirby : MonoBehaviour {
 		}
 	}
 
+	void FixedUpdate(){
+		//just need this in place for raycasting
+	}
 }
