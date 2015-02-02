@@ -178,6 +178,9 @@ public class PE_Obj : MonoBehaviour {
 		print ("col_ext x " + col_ext.x);
 		print ("horiz_len " + horiz_len);
 		print ("vert_len " + vert_len);
+		//Slope_pts col_slope = col.gameObject.getComponent<Slope_pts> ();
+		//Vector3 col_p0 = col_slope.TR;
+		//Vector3 col_p1 = col_slope.TR;
 		Vector3 col_p0 = new Vector3(col_center.x - horiz_len, col_center.y - vert_len, 0f);
 		Vector3 col_p1 = new Vector3(col_center.x + horiz_len, col_center.y + vert_len, 0f);
 		Vector3 p2 = new Vector3(collider.bounds.center.x + collider.bounds.extents.x, 
