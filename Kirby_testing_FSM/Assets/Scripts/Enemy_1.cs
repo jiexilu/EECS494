@@ -151,15 +151,15 @@ public class Enemy_1 : MonoBehaviour {
 //		if (Physics.Raycast (transform.position, rayDir, out hit, 10f)) {
 //
 //		}
-		int len = points.Length;
-		if (index >= len) {
-			index = 0;		
-		}
-		var dir = points[index] - gameObject.transform.position;
-			dir.Normalize();
-			if(gameObject.transform.position != points[0]){
-				vel.x = dir.x * speed; 
-			}
+//		int len = points.Length;
+//		if (index >= len) {
+//			index = 0;		
+//		}
+//		var dir = points[index] - gameObject.transform.position;
+//			dir.Normalize();
+//			if(gameObject.transform.position != points[0]){
+//				vel.x = dir.x * speed; 
+//			}
 	//what to do when done pacing?
 //		gameObject.SetActive (false);
 	}

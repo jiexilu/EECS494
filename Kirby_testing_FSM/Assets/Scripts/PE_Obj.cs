@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-//using UnityEditor;
+using System.Collections.Generic;
 
 public enum Col_dir {
 	none,
@@ -20,18 +20,15 @@ public class PE_Obj : MonoBehaviour {
 	public Vector3 next_pos = Vector3.zero; 
 	
 	public PE_Obj ground = null; 
-	public Col_dir col_dir; 
+	public Col_dir col_dir = Col_dir.none;
+	
+	public bool is_under_water = false;
+	BoxCollider box;
+	
 	
 	void Start() {
 		PhysEngine.objs.Add (this);
-		col_dir = Col_dir.none; 
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-	
 	
 	void OnTriggerEnter(Collider other) {
 		if (still) return;
@@ -39,7 +36,7 @@ public class PE_Obj : MonoBehaviour {
 		PE_Obj otherPEO = other.GetComponent<PE_Obj>();
 		if (otherPEO == null) return;
 		
-		ResolveCollisionWith(otherPEO);
+		ResolveCollisionWith (otherPEO);
 	}
 	
 	void OnTriggerStay(Collider other) {
@@ -58,6 +55,13 @@ public class PE_Obj : MonoBehaviour {
 		if (ground == otherPEO) {
 			ground = null;
 		}
+		if (otherPEO.CompareTag("Pool") && is_under_water) {
+			is_under_water = false;
+		}
+	}
+	
+	void Update() {
+		
 	}
 	
 	void ResolveCollisionWith(PE_Obj col) {
@@ -72,7 +76,7 @@ public class PE_Obj : MonoBehaviour {
 		float col_y_up = col.transform.position.y + col_y_lossy;
 		
 		// get object boundaries
-		BoxCollider box = GetComponent<BoxCollider> ();
+		box = GetComponent<BoxCollider> ();
 		Vector3 box_size = box.size;
 		float x_lossy = (transform.lossyScale.x / 2f) * box_size.x; 
 		float y_lossy = (transform.lossyScale.y / 2f) * box_size.y; 
@@ -86,18 +90,21 @@ public class PE_Obj : MonoBehaviour {
 		float dif_y = 0f;
 		
 		// collision up of kirby
-		if (vel.y > 0 && col_y_down < y_up && PhysEngine.LEQ(y_up, col_y_down)) {
+		if (vel.y > 0 && PhysEngine.LEQ(y_up, col_y_down)) {
 			//get new position 
 			dif_y = Mathf.Abs (y_up - col_y_down);
 			//set new position 
 			next_pos.y -= dif_y;
 			//set velocity to zero
 			vel.y = 0f;
-		} else if (vel.y < 0 && col_y_up > y_down && PhysEngine.GEQ(y_down, col_y_up)) { // collision on the bottom of kirby
+		} else if (vel.y < 0) { // collision on the bottom of kirby
 			if (col.CompareTag("Slope")) {
-				print ("slope col down");
+				//				print ("slope col down");
 				Slope_resolution(col);
-			} else {
+			} else if (col.CompareTag("Pool")) {
+				//				print ("col with water");
+				Water_resolution(col);
+			} else if (PhysEngine.GEQ(y_down, col_y_up))  {
 				//get new position 
 				dif_y = Mathf.Abs (y_down - col_y_up);
 				//set new position 
@@ -114,7 +121,7 @@ public class PE_Obj : MonoBehaviour {
 		if (vel.x > 0 && col != ground && !within_x_bound(x_left, x_right, col_x_left, col_x_right)) {  
 			col_dir = Col_dir.right;
 			if (col.CompareTag("Slope")) {
-				print ("slope col right");
+				//				print ("slope col right");
 				Slope_resolution(col);
 			} else {
 				//get new position 
@@ -128,7 +135,7 @@ public class PE_Obj : MonoBehaviour {
 			col_dir = Col_dir.left; 
 			// collision to the left of kirby
 			if (col.CompareTag("Slope")) {
-				print ("slope col left");
+				//				print ("slope col left");
 				//Slope_resolution(col);
 			} else {
 				//get new position 
@@ -142,21 +149,13 @@ public class PE_Obj : MonoBehaviour {
 			vel.x = 0f; 
 		}
 		
-		float temp = cur_pos.x + 1;
-		if (next_pos.x > temp) {
+		float temp = Mathf.Abs(Vector3.Distance(next_pos, cur_pos));
+		if (temp >= 0.5f) {
 			print ("Big difference!!!!");
-			if (col_dir == Col_dir.left) {
-				print ("left");
-			} else if (col_dir == Col_dir.right) {
-				print ("right");
-			}
+			return;
 		}
-		
-		//		print ("cur position" + cur_pos);
-		//		print ("next position" + next_pos);
 		cur_pos = next_pos;
 		transform.position = cur_pos;
-		
 	}
 	
 	bool within_x_bound(float k_lx, float k_rx, float c_lx, float c_rx) {
@@ -167,38 +166,36 @@ public class PE_Obj : MonoBehaviour {
 	}
 	
 	void Slope_resolution(PE_Obj col) {
-		grav = PE_GravType.none;
-		Vector3 col_center = col.collider.bounds.center;
-		Vector3 col_ext = col.collider.bounds.extents;
-		float horiz_len = Mathf.Sqrt(Mathf.Pow(col_ext.x, 2f) + Mathf.Pow(col_ext.y, 2f));
-		float rot_deg = col.transform.rotation.eulerAngles.z;
-		float rot_rad = rot_deg * Mathf.Deg2Rad;
-		float vert_len = horiz_len * Mathf.Sin(rot_rad);
-		print ("col_ext y " + col_ext.y);
-		print ("col_ext x " + col_ext.x);
-		print ("horiz_len " + horiz_len);
-		print ("vert_len " + vert_len);
-		//Slope_pts col_slope = col.gameObject.getComponent<Slope_pts> ();
-		//Vector3 col_p0 = col_slope.TR;
-		//Vector3 col_p1 = col_slope.TR;
-		Vector3 col_p0 = new Vector3(col_center.x - horiz_len, col_center.y - vert_len, 0f);
-		Vector3 col_p1 = new Vector3(col_center.x + horiz_len, col_center.y + vert_len, 0f);
-		Vector3 p2 = new Vector3(collider.bounds.center.x + collider.bounds.extents.x, 
-		                         collider.bounds.center.y - collider.bounds.extents.y, 0f);
+		// How would I make this universal so it applies to the enemies and kirby
+		if (!CompareTag("Player")) return;
+		Kirby kirby = gameObject.GetComponent<Kirby> ();
+		Direction cur_dir = kirby.cur_dir;
+		Slope_pts col_slope = col.gameObject.GetComponent<Slope_pts> ();
+		float slope_angle = col.transform.eulerAngles.z; 
+		print ("euler Angle " + slope_angle);
+		Vector3 col_p0; // bottom point on slope
+		Vector3 col_p1; // top point on slope
+		Vector3 p2; // object intersect position
+		
+		if (slope_angle < 90f) {
+			col_p0 = col_slope.TL.position;
+			col_p1 = col_slope.TR.position;
+			p2 = kirby.BR.position;
+		} else { //  if (slope_angle > 90f) 
+			print ("slope angle is greater than 90f");
+			col_p0 = col_slope.BL.position;
+			col_p1 = col_slope.BR.position;
+			p2 = kirby.BL.position;
+		}
+		
 		Vector3 v1 = col_p1 - col_p0;
 		Vector3 v2 = p2 - col_p0;
-		Debug.DrawLine (col_p0, col_p1, Color.yellow, 1000f);
-		Debug.DrawLine (p2, col_p0, Color.white, 1000f);
+		Debug.DrawLine (col_p0, col_p1, Color.red, 10f);
+		Debug.DrawLine (p2, col_p0, Color.black, 10f);
 		v1.Normalize();
 		float dot_result = Vector3.Dot(v1, v2);
 		Vector3 projection = (v1 * dot_result) + col_p0;
-		print ("rot_deg " + rot_deg); 
-		print ("point0 " + col_p0);
-		print ("point1 " + col_p1);
-		print ("point2 " + p2);
-		print ("v1 " + v1);
-		print ("v2 " + v2);
-		print ("this is the projection " + projection);
+		Debug.DrawLine (col_p0, projection, Color.green, 10f);
 		
 		// Use interpolation to find pQx
 		// Find the percentage of distance along [p1…p0]
@@ -209,18 +206,53 @@ public class PE_Obj : MonoBehaviour {
 		u = (p2.x - col_p0.x) / (col_p1.x - col_p0.x);
 		Vector3 y_movement = (1-u)*col_p0 + u*col_p1;
 		
-		print ("X movement " + x_movement);
-		print ("Y movement " + y_movement);
+		float y_dist = Vector3.Distance (y_movement, p2);
+		float x_dist = Vector3.Distance (x_movement, p2);
+		
+		Debug.DrawLine (p2, x_movement, Color.yellow, 10f);
+		Debug.DrawLine (p2, y_movement, Color.blue, 10f);
+		
+		//		print ("X dist " + x_dist);
+		//		print ("Y dist " + y_dist);
 		print ("current pos " + next_pos);
-		//		next_pos.y += Mathf.Abs(projection.y - cur_pos.y);
-		//		next_pos.x += Mathf.Abs(projection.x - cur_pos.x);
-		next_pos.y += Mathf.Abs(y_movement.y - cur_pos.y);
-		//next_pos.x += Mathf.Abs(x_movement.x - cur_pos.x);
-		//print ("result " + result);
+		if (slope_angle < 90f && cur_dir == Direction.right) {
+			next_pos.y += y_dist;
+		} else if (slope_angle < 90f && cur_dir == Direction.left) {
+			next_pos.x -= x_dist;
+		} else if (slope_angle > 90f && cur_dir == Direction.right) {
+			next_pos.x += x_dist;
+		} else { // slope_angle > 90f && cur_dir == Direction.left
+			next_pos.y += y_dist;
+		}
+		
 		print ("new pos " + next_pos);
 		//set velocity to zero
 		vel.y = 0f;
 		ground = col; 
+	}
+	
+	void Water_resolution(PE_Obj col) {
+		// if it's an enemy, make sure it's underwater tag is set to true 
+		// so it can be deleted once it hits the bottom
+		if (!CompareTag("Player")) return;
+		Kirby kirby = gameObject.GetComponent<Kirby> ();
+		if (kirby.is_floating) {
+			// handle this just as if it was ground
+			float col_y_lossy = col.transform.lossyScale.y / 2f; 
+			float col_y_up = col.transform.position.y + col_y_lossy;
+			
+			// get object boundaries
+			Vector3 box_size = box.size;
+			float y_lossy = (transform.lossyScale.y / 2f) * box_size.y; 
+			float y_down = transform.position.y - y_lossy;
+			
+			//set new position 
+			next_pos.y += Mathf.Abs (y_down - col_y_up);
+			//set velocity to zero
+			vel.y = 0f;
+		} else {
+			is_under_water = true; 
+		}
 	}
 	
 }

@@ -29,8 +29,8 @@ public class Kirby_personal_space : MonoBehaviour {
 			Vector3 kirbyPosition = transform.position; 
 			Vector3 targetPosition = col.gameObject.transform.position;
 			Vector3 moveTowardsPosition = kirbyPosition - targetPosition;
-			if((moveTowardsPosition.x < 0 && kirby.prev_dir == Direction.right) ||
-			   (moveTowardsPosition.x > 0 && kirby.prev_dir == Direction.left)){
+			if((moveTowardsPosition.x < 0 && kirby.cur_dir == Direction.right) ||
+			   (moveTowardsPosition.x > 0 && kirby.cur_dir == Direction.left)){
 				kirby.near_enemy = true;
 				nearby_enemy = col;	
 			}
@@ -42,8 +42,8 @@ public class Kirby_personal_space : MonoBehaviour {
 		//			Vector3 kirbyPosition = transform.position; 
 		//			Vector3 targetPosition = col.gameObject.transform.position;
 		//			Vector3 moveTowardsPosition = kirbyPosition - targetPosition;
-		//			if((moveTowardsPosition.x < 0 && kirby.prev_dir == Direction.right) ||
-		//				(moveTowardsPosition.x > 0 && kirby.prev_dir == Direction.left)){
+		//			if((moveTowardsPosition.x < 0 && kirby.cur_dir == Direction.right) ||
+		//				(moveTowardsPosition.x > 0 && kirby.cur_dir == Direction.left)){
 		//				kirby.near_enemy = true;
 		//				nearby_enemy = col;	
 		//			}
@@ -62,8 +62,8 @@ public class Kirby_personal_space : MonoBehaviour {
 		Vector3 targetPosition = col.gameObject.transform.position;
 		Vector3 moveTowardsPosition = kirbyPosition - targetPosition;
 		float speed = 5f;
-		if((moveTowardsPosition.x < 0 && kirby.prev_dir == Direction.right) ||
-		   (moveTowardsPosition.x > 0 && kirby.prev_dir == Direction.left)) {
+		if((moveTowardsPosition.x < 0 && kirby.cur_dir == Direction.right) ||
+		   (moveTowardsPosition.x > 0 && kirby.cur_dir == Direction.left)) {
 			moveTowardsPosition.Normalize();
 			col.gameObject.transform.Translate(
 				(moveTowardsPosition.x * speed * Time.deltaTime),

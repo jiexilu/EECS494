@@ -60,9 +60,9 @@ public class Kirby : MonoBehaviour {
 
 	public bool has_enemy = false;
 	public power_type power = power_type.none;
-	//public bool is_floating = false; 
+	public bool is_floating = false; 
 	public bool near_enemy = false;
-	public Direction prev_dir = Direction.right;
+	public Direction cur_dir = Direction.right;
 	public float life = 4f;
 	public int health = 6;
 
@@ -79,26 +79,41 @@ public class Kirby : MonoBehaviour {
 	private Vector3 duck_box_size = new Vector3(1f, 0.5f, 1f);
 	private Vector3 slide_box_size = new Vector3(2f, 1f, 1f);
 
+	public Transform BL, BR;
+
+	void Awake () {
+		BL = transform.Find ("BL");
+		BR = transform.Find ("BR");
+		box = GetComponent<BoxCollider> ();
+	}
+
 	// Use this for initialization
 	void Start () {
 		my_obj = GetComponent<PE_Obj> ();
-		box = GetComponent<BoxCollider> ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
 		vel = my_obj.vel;
-		
+		if (under_water && !my_obj.is_under_water) {
+			print ("curstate inhale");
+			cur_state = State.inhale;
+		} else if (my_obj.is_under_water) {
+			print ("curstate stand water");
+			cur_state = State.stand_water;
+		}
+		under_water = my_obj.is_under_water; 
+
 		//print (vel);
 		reached_ground = (my_obj.ground != null);
 		next_state = cur_state; 
 
 		// you can only increase jump when you've reached ground AND you've released the up key 
 		//Input.GetKeyUp(KeyCode.X) || Input.GetKeyUp(KeyCode.Period)
-		if (reached_ground) {
-			increase_jump = true; 
-		}
+//		if (reached_ground) {
+//			increase_jump = true; 
+//		}
 
 		// input + cur_state = next_state; 
 		switch (cur_state) {
@@ -148,20 +163,20 @@ public class Kirby : MonoBehaviour {
 	void state_stand() {
 		horiz_movement();
 		cur_stand = State.stand;
-		if (prev_dir == Direction.right) {
+		if (cur_dir == Direction.right) {
 			sprite_kirby.SetInteger("Action", 0);
 		} else {
 			sprite_kirby.SetInteger("Action", 1);
 		}
 		if (Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.A)) {
 			// left input
-			prev_dir = Direction.left;
+			cur_dir = Direction.left;
 			sprite_kirby.SetInteger ("Action", 3);
 		} 
 		if (Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.D)) {
 			// right input
 			sprite_kirby.SetInteger ("Action", 2);
-			prev_dir = Direction.right;
+			cur_dir = Direction.right;
 		} 
 		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) {
 			// up input
@@ -192,7 +207,7 @@ public class Kirby : MonoBehaviour {
 				if (transform.position.y >= 3.4f) {
 					increase_jump = false; 
 				}
-				if (prev_dir == Direction.right) {
+				if (cur_dir == Direction.right) {
 					sprite_kirby.SetInteger ("Action", 10);
 				}
 				else{
@@ -213,13 +228,12 @@ public class Kirby : MonoBehaviour {
 	void state_inhale() {
 		// Do a little hop
 		my_obj.grav = PE_GravType.none; 
-		print ("is_floating is true");
-		if (prev_dir != Direction.left) {
+		if (cur_dir != Direction.left) {
 			sprite_kirby.SetInteger ("Action", 4);
-			prev_dir = Direction.right;	
+			cur_dir = Direction.right;	
 		} else {
 			sprite_kirby.SetInteger ("Action", 4);
-			prev_dir = Direction.left;
+			cur_dir = Direction.left;
 		}
 		change_height (0.75f);
 		box.size = puffed_box_size;
@@ -227,16 +241,17 @@ public class Kirby : MonoBehaviour {
 	}
 
 	void state_floating() {
+		is_floating = true; 
 		horiz_movement();
 		// left input
 		if (Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.A)) {
-			prev_dir = Direction.left;
+			cur_dir = Direction.left;
 			sprite_kirby.SetInteger ("Action", 13);
 		} 
 		// right input
 		if (Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.D)) {
 			sprite_kirby.SetInteger ("Action", 12);
-			prev_dir = Direction.right;
+			cur_dir = Direction.right;
 		}
 		// up and a input
 		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W) 
@@ -244,12 +259,12 @@ public class Kirby : MonoBehaviour {
 			
 			increase_floating(my_obj);
 			
-			if (prev_dir != Direction.left) {
+			if (cur_dir != Direction.left) {
 				sprite_kirby.SetInteger ("Action", 12);
-				prev_dir = Direction.right;	
+				cur_dir = Direction.right;	
 			} else {
 				sprite_kirby.SetInteger ("Action", 13);
-				prev_dir = Direction.left;	
+				cur_dir = Direction.left;	
 			}
 		} else {
 			decrease_floating();
@@ -258,6 +273,7 @@ public class Kirby : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
 			my_obj.grav = PE_GravType.constant; 
 			print ("release air. is_floating is false");
+			is_floating = false; 
 			next_state = State.shoot;
 		}
 	}
@@ -266,15 +282,15 @@ public class Kirby : MonoBehaviour {
 		// duck!
 		//TODO: Decrease Scale
 		print ("duck!");
-		if (prev_dir == Direction.right) {
+		if (cur_dir == Direction.right) {
 			sprite_kirby.SetInteger ("Action", 6);
-		} else if(prev_dir == Direction.left) {
+		} else if(cur_dir == Direction.left) {
 			sprite_kirby.SetInteger ("Action", 7);
 		}
 		// b input
 		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
 			// slide
-			if(prev_dir == Direction.right){
+			if(cur_dir == Direction.right){
 				sprite_kirby.SetInteger("Action", 22);
 			}
 			else{
@@ -299,7 +315,7 @@ public class Kirby : MonoBehaviour {
 		if (Time.time < usage) {
 			// increase velocity in the direction you are facing 
 			// keep increasing until you've reached a certain time
-			float vX = (prev_dir == Direction.right) ? slide_x : -slide_x;
+			float vX = (cur_dir == Direction.right) ? slide_x : -slide_x;
 			vel.x = vX * slide_speed;
 		} else {
 			set_delay = false;
@@ -323,7 +339,7 @@ public class Kirby : MonoBehaviour {
 			if (puff == null) {
 				print ("Puff is null");
 			}
-			if (prev_dir == Direction.right) {
+			if (cur_dir == Direction.right) {
 				print ("puffball goes right");
 				puff.go_right = true;
 			} 
@@ -343,7 +359,7 @@ public class Kirby : MonoBehaviour {
 			if (starfire == null) {
 				print ("Puff is null");
 			}
-			if (prev_dir == Direction.right) {
+			if (cur_dir == Direction.right) {
 				print ("puffball goes right");
 				starfire.go_right = true;
 			} 
@@ -358,10 +374,10 @@ public class Kirby : MonoBehaviour {
 	}
 
 	void state_suck() {
-		if (prev_dir == Direction.right) {
+		if (cur_dir == Direction.right) {
 			sprite_kirby.SetInteger ("Action", 14);
 		}
-		else if (prev_dir == Direction.left) {
+		else if (cur_dir == Direction.left) {
 			sprite_kirby.SetInteger ("Action", 15);
 		}
 		// personal space stuff goes here
@@ -378,20 +394,20 @@ public class Kirby : MonoBehaviour {
 	void state_stand_enemy() {
 		cur_stand = State.stand_enemy;
 		horiz_movement();
-		if (prev_dir == Direction.right) {
+		if (cur_dir == Direction.right) {
 			sprite_kirby.SetInteger ("Action", 20);
 		}
-		else if (prev_dir == Direction.left) {
+		else if (cur_dir == Direction.left) {
 			sprite_kirby.SetInteger ("Action", 21);
 		}
 		// left input
 		if (Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.A)) {
-			prev_dir = Direction.left;
+			cur_dir = Direction.left;
 			sprite_kirby.SetInteger ("Action", 17);
 		} 
 		// right input
 		if (Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.D)) {
-			prev_dir = Direction.right;
+			cur_dir = Direction.right;
 			sprite_kirby.SetInteger ("Action", 16);
 		} 
 		// down input
@@ -442,20 +458,20 @@ public class Kirby : MonoBehaviour {
 	void state_stand_power() {
 		horiz_movement();
 		cur_stand = State.stand_power;
-		if (prev_dir == Direction.right) {
+		if (cur_dir == Direction.right) {
 			sprite_kirby.SetInteger("Action", 0);
 		} else {
 			sprite_kirby.SetInteger("Action", 1);
 		}
 		if (Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.A)) {
 			// left input
-			prev_dir = Direction.left;
+			cur_dir = Direction.left;
 			sprite_kirby.SetInteger ("Action", 3);
 		} 
 		if (Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.D)) {
 			// right input
 			sprite_kirby.SetInteger ("Action", 2);
-			prev_dir = Direction.right;
+			cur_dir = Direction.right;
 		} 
 		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) {
 			// up input
@@ -496,7 +512,7 @@ public class Kirby : MonoBehaviour {
 						GameObject projectile = Instantiate (beam) as GameObject;
 						projectile.transform.position = transform.position;
 						Attack beam_power = projectile.GetComponent<Attack> ();
-						beam_power.go_right = (prev_dir == Direction.right) ? true : false;
+						beam_power.go_right = (cur_dir == Direction.right) ? true : false;
 						beam_power.poof = true;
 						break;
 				case power_type.fire:
@@ -504,7 +520,7 @@ public class Kirby : MonoBehaviour {
 						GameObject fire = Instantiate (fireball) as GameObject;
 						fire.transform.position = transform.position;
 						Attack fire_power = fire.GetComponent<Attack> ();
-						fire_power.go_right = (prev_dir == Direction.right) ? true : false;		
+						fire_power.go_right = (cur_dir == Direction.right) ? true : false;		
 						fire_power.poof = true;
 						break;
 				case power_type.spark:
@@ -512,21 +528,21 @@ public class Kirby : MonoBehaviour {
 						GameObject sparks = Instantiate (spark) as GameObject;
 						sparks.transform.position = transform.position;
 						Attack spark_power = sparks.GetComponent<Attack> ();
-						spark_power.go_right = (prev_dir == Direction.right) ? true : false;		
+						spark_power.go_right = (cur_dir == Direction.right) ? true : false;		
 						spark_power.poof = true;
 						print ("SPARK");
 						break;
 				case power_type.sing:
 						print ("SING!");
-						if (prev_dir == Direction.right) {
+						if (cur_dir == Direction.right) {
 								sprite_kirby.SetInteger ("Action", 14);
-						} else if (prev_dir == Direction.left) {
+						} else if (cur_dir == Direction.left) {
 								sprite_kirby.SetInteger ("Action", 15);
 						}
 						GameObject notes = Instantiate (musicNotes) as GameObject;
 						notes.transform.position = transform.position;
 						Attack sing_power = notes.GetComponent<Attack> ();	
-						sing_power.go_right = (prev_dir == Direction.right) ? true : false;
+						sing_power.go_right = (cur_dir == Direction.right) ? true : false;
 						sing_power.poof = true;
 						cam.music_power = true;
 						GameObject bubble = Instantiate(musicBubble) as GameObject;
@@ -545,20 +561,20 @@ public class Kirby : MonoBehaviour {
 	void state_under_water() {
 		my_obj.grav = PE_GravType.none;
 		horiz_movement();
-		if (prev_dir == Direction.right) {
+		if (cur_dir == Direction.right) {
 			sprite_kirby.SetInteger("Action", 0);
 		} else {
 			sprite_kirby.SetInteger("Action", 1);
 		}
 		if (Input.GetKey (KeyCode.LeftArrow) || Input.GetKey (KeyCode.A)) {
 			// left input
-			prev_dir = Direction.left;
+			cur_dir = Direction.left;
 			sprite_kirby.SetInteger ("Action", 3);
 		} 
 		if (Input.GetKey (KeyCode.RightArrow) || Input.GetKey (KeyCode.D)) {
 			// right input
 			sprite_kirby.SetInteger ("Action", 2);
-			prev_dir = Direction.right;
+			cur_dir = Direction.right;
 		} 
 		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)
 		    || Input.GetKey(KeyCode.X) || Input.GetKey(KeyCode.Period)) {
@@ -586,7 +602,6 @@ public class Kirby : MonoBehaviour {
 
 	void increase_floating(PE_Obj my_obj) {
 		vel.y = float_speed;
-		print ("move up");
 		my_obj.ground = null; 
 	}
 	
@@ -625,14 +640,6 @@ public class Kirby : MonoBehaviour {
 
 	void OnTriggerEnter(Collider col) {
 		// When Kirby collides with something
-		if (col.gameObject.tag == "Pool" && cur_state != State.floating) {
-			print ("should not float on top of the pool");
-			under_water = true;
-		} else if (col.gameObject.tag == "Pool" && cur_state == State.floating) {
-			print ("should float on top of the pool");
-			// float on top
-			float_in_pool(col);
-		}
 		if (col.gameObject.tag == "Enemy") {
 			print ("Kirby collided");
 			Enemy_1 enemy = col.gameObject.GetComponent<Enemy_1>();
@@ -666,24 +673,12 @@ public class Kirby : MonoBehaviour {
 			near_enemy = false;
 		}
 	}
-	
-	void onTriggerStay(Collider col) {
-		if (col.gameObject.tag == "Pool" && cur_state == State.floating) {
-			print ("should float on top of the pool");
-			// float on top
-			float_in_pool(col);
-		}
-	}
 
 	void OnTriggerExit(Collider col){
 		print ("Kirby exiting collider");
 		my_obj = gameObject.GetComponent<PE_Obj> ();
 		if (col.gameObject.tag == "Ground") {
 			my_obj.ground = null;  
-		}
-		if (col.gameObject.tag == "Pool") {
-			under_water = false;
-			next_state = cur_stand;
 		}
 	}
 
