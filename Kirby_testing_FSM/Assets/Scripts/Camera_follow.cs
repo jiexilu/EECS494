@@ -11,6 +11,7 @@ public class Camera_follow : MonoBehaviour {
 	public bool music_power = false;
 
 	void Awake(){
+
 	}
 
 	// Use this for initialization
@@ -42,10 +43,10 @@ public class Camera_follow : MonoBehaviour {
 		tp.x = target.position.x;
 		if (target.position.x < -5.14f) {
 			tp.x = -5.12f;
-		} else if (target.position.x > 17.11f) {
-			tp.x = 17.11f;	
+		} else if (target.position.x > 40.04f) {
+			tp.x = 40.04f;	
 		}
-		else if (target.position.x > -5.14 && target.position.x < 17.11) {
+		else if (target.position.x > -5.14 && target.position.x < 40.04f) {
 			tp.x = target.position.x;
 		}
 		//TODO: change it so it works for each level
@@ -55,11 +56,21 @@ public class Camera_follow : MonoBehaviour {
 					tp.y = target.position.y;
 				}
 				break;
+			case 2:
+				if(target.position.y < -8.53){
+					tp.y = target.position.y;
+				}
+				break;
+			case 3:
+				if (target.position.y < -19.96) {
+					tp.y = target.position.y;
+				}
+				break;
 			case 4:
 				if (target.position.y < -30.34) {
 					tp.y = target.position.y;
 				}
-			break;
+				break;
 		}
 
 		transform.position = tp;

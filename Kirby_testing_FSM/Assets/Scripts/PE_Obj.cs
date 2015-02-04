@@ -99,10 +99,8 @@ public class PE_Obj : MonoBehaviour {
 			vel.y = 0f;
 		} else if (vel.y < 0) { // collision on the bottom of kirby
 			if (col.CompareTag("Slope")) {
-				//				print ("slope col down");
 				Slope_resolution(col);
 			} else if (col.CompareTag("Pool")) {
-				//				print ("col with water");
 				Water_resolution(col);
 			} else if (PhysEngine.GEQ(y_down, col_y_up))  {
 				//get new position 
@@ -212,8 +210,8 @@ public class PE_Obj : MonoBehaviour {
 		Debug.DrawLine (p2, x_movement, Color.yellow, 10f);
 		Debug.DrawLine (p2, y_movement, Color.blue, 10f);
 		
-		//		print ("X dist " + x_dist);
-		//		print ("Y dist " + y_dist);
+		print ("X dist " + x_dist);
+		print ("Y dist " + y_dist);
 		print ("current pos " + next_pos);
 		if (slope_angle < 90f && cur_dir == Direction.right) {
 			next_pos.y += y_dist;

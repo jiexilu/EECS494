@@ -5,7 +5,7 @@ public class Door : MonoBehaviour {
 
 	public Camera main_camera;
 	public Transform doorPort;
-	public int next_level;
+	public int next_level = 2;
 
 	// Use this for initialization
 	void Start () {
@@ -30,9 +30,8 @@ public class Door : MonoBehaviour {
 				cam_location.x = -5.067625f;
 				main_camera.transform.position = cam_location;
 				Camera_follow cam = main_camera.GetComponent<Camera_follow>();
-				if(next_level == 4){
-					cam.cur_level = 4;
-				}
+				cam.cur_level = next_level;
+				next_level++;
 			}
 		}
 	}

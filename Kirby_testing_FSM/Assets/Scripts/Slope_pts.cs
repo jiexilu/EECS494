@@ -14,9 +14,9 @@ public class Slope_pts : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		Debug.Log ("TL: " + TL.position.ToString());
-		Debug.Log ("TR: " + TR.position.ToString());
-		Debug.Log ("BL: " + BL.position.ToString());
-		Debug.Log ("BR: " + BR.position.ToString());
+//		Debug.Log ("TL: " + TL.position.ToString());
+//		Debug.Log ("TR: " + TR.position.ToString());
+//		Debug.Log ("BL: " + BL.position.ToString());
+//		Debug.Log ("BR: " + BR.position.ToString());
 	}
 }

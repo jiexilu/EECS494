@@ -1,6 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Kirby.cs">
+    <Files>
+      <File FileName="Assets/Scripts/PhysEngine.cs" Line="98" Column="1" />
+      <File FileName="Assets/Scripts/PE_Obj.cs" Line="104" Column="1" />
+      <File FileName="Assets/Scripts/Kirby.cs" Line="96" Column="18" />
+      <File FileName="Assets/Scripts/Kirby_personal_space.cs" Line="18" Column="18" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
