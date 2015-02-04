@@ -31,7 +31,9 @@ public class Door : MonoBehaviour {
 				main_camera.transform.position = cam_location;
 				Camera_follow cam = main_camera.GetComponent<Camera_follow>();
 				cam.cur_level = next_level;
-				next_level++;
+				if (cam.cur_level == 4) {
+					Application.LoadLevel(2);
+				}
 			}
 		}
 	}

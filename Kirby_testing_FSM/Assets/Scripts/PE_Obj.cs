@@ -32,7 +32,11 @@ public class PE_Obj : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider other) {
 		if (still) return;
-		
+
+		if (this.gameObject.name == "Kirby") {
+			print("Stop");
+		}
+
 		PE_Obj otherPEO = other.GetComponent<PE_Obj>();
 		if (otherPEO == null) return;
 		
@@ -90,7 +94,7 @@ public class PE_Obj : MonoBehaviour {
 		float dif_y = 0f;
 		
 		// collision up of kirby
-		if (vel.y > 0 && PhysEngine.LEQ(y_up, col_y_down)) {
+		if (vel.y > 0 && PhysEngine.GEQ(y_up, col_y_down)) {
 			//get new position 
 			dif_y = Mathf.Abs (y_up - col_y_down);
 			//set new position 
@@ -102,7 +106,7 @@ public class PE_Obj : MonoBehaviour {
 				Slope_resolution(col);
 			} else if (col.CompareTag("Pool")) {
 				Water_resolution(col);
-			} else if (PhysEngine.GEQ(y_down, col_y_up))  {
+			} else if (PhysEngine.LEQ(y_down, col_y_up))  {
 				//get new position 
 				dif_y = Mathf.Abs (y_down - col_y_up);
 				//set new position 
