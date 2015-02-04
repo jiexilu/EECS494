@@ -31,6 +31,8 @@ public class Kirby : MonoBehaviour {
 	public GameObject puffBall_prefab;
 	public GameObject star;
 	public GameObject beam;
+	public GameObject spark;
+	public GameObject fireball;
 	public Animator sprite_kirby;
 	public Camera_follow cam;
 	public BoxCollider box;  
@@ -44,9 +46,10 @@ public class Kirby : MonoBehaviour {
 	public float max_jump_speed = 8f; 
 	public bool reached_ground = false; 
 	public float usage;
+	public float attack_usage;
 	public float delay;
 	public float slide_delay = 0.5f;
-	public float attack_delay = 0.01f;
+	public float attack_delay = 5f;
 	public bool set_delay = false; 
 	public bool set_attack_delay = false;
 	public bool set_paralyzed_delay = false;
@@ -419,7 +422,12 @@ public class Kirby : MonoBehaviour {
 			has_enemy = false;
 			sprite_kirby.SetInteger ("Action", 0);
 			box.size = standing_box_size;
-			next_state = State.stand_power; 
+			if(power != power_type.none){
+				next_state = State.stand_power; 
+			}
+			else{
+				next_state = State.stand;
+			}
 		} 
 		if (Input.GetKeyDown (KeyCode.Z) || Input.GetKeyDown (KeyCode.Comma)) {
 			next_state = State.shoot;
@@ -476,7 +484,7 @@ public class Kirby : MonoBehaviour {
 	void state_use_power() {
 		if (!set_attack_delay) {
 			vel.x = 0;
-			usage = Time.time + attack_delay;		
+			attack_usage = Time.time + attack_delay;		
 			print ("Kirby attacks with power!");
 			set_attack_delay = true;
 			switch (power) {
@@ -493,8 +501,19 @@ public class Kirby : MonoBehaviour {
 						break;
 				case power_type.fire:
 						print ("FIRE");
+						GameObject fire = Instantiate (fireball) as GameObject;
+						fire.transform.position = transform.position;
+						Attack fire_power = fire.GetComponent<Attack> ();
+						fire_power.go_right = (prev_dir == Direction.right) ? true : false;		
+						fire_power.poof = true;
 						break;
 				case power_type.spark:
+						sprite_kirby.SetInteger("Action", 24);	
+						GameObject sparks = Instantiate (spark) as GameObject;
+						sparks.transform.position = transform.position;
+						Attack spark_power = sparks.GetComponent<Attack> ();
+						spark_power.go_right = (prev_dir == Direction.right) ? true : false;		
+						spark_power.poof = true;
 						print ("SPARK");
 						break;
 				case power_type.sing:
@@ -514,10 +533,9 @@ public class Kirby : MonoBehaviour {
 						bubble.transform.position = transform.position;
 						break;
 			}
-		
 		}
 		//TODO: while attacking, don't change states
-		if (Time.time > usage) {
+		if (Time.time > attack_usage) {
 			cam.music_power = false;
 			next_state = State.stand_power;
 			set_attack_delay = false;
@@ -641,6 +659,9 @@ public class Kirby : MonoBehaviour {
 				Got_Attacked(); 
 				//TODO: i want to call got_attaked in enemy_1 script
 			}
+			if(col.gameObject.tag == "boss"){
+				Got_Attacked();
+			}
 			col.gameObject.SetActive(false);
 			near_enemy = false;
 		}
@@ -668,19 +689,22 @@ public class Kirby : MonoBehaviour {
 
 
 	public void Got_Attacked(){
-		health--;
-		if (health == 0 && life > 1) {
-			life--;
-			health = 6;
-			Vector3 temp = kirby_spawner.transform.position;
-			temp.z = 0;
-			transform.position = temp;
-			next_state = State.stand;
-
-		}
-		if (life == 0 && health == 0) {
-			print ("Game over");
-			gameObject.SetActive(false);
+		GameObject go = GameObject.Find("godMode");
+		godMode god = go.GetComponent<godMode>();
+		if (!god.god_mode) {
+			health--;
+			if (health == 0 && life > 1) {
+				life--;
+				health = 6;
+				Vector3 temp = kirby_spawner.transform.position;
+				temp.z = 0;
+				transform.position = temp;
+				next_state = State.stand;
+			}
+			if (life == 0 && health == 0) {
+				print ("Game over");
+				gameObject.SetActive (false);
+			}
 		}
 	}
 

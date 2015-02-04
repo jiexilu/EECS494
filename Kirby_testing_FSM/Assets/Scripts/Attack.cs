@@ -2,7 +2,8 @@
 using System.Collections;
 
 public class Attack : MonoBehaviour {
-	
+
+	public Animator sprite;
 	private float distance;
 	public Kirby kirby;
 	public bool go_right;
@@ -28,35 +29,49 @@ public class Attack : MonoBehaviour {
 	}
 	
 	void shoot(){
-		if (power == power_type.none || power == power_type.fire) {
+		if (power == power_type.none) {
 			if (go_right) {
 				transform.Translate (Time.deltaTime * 6, 0, 0);
+				sprite.SetInteger("Direction", 0);
 				if (transform.position.x > distance) {
-					Destroy (this.gameObject);	
+						Destroy (this.gameObject);	
 				}
 			} else {
+				sprite.SetInteger("Direction", 1);
 				transform.Translate (Time.deltaTime * -6, 0, 0);
 				if (transform.position.x < distance) {
-					Destroy (this.gameObject);	
+						Destroy (this.gameObject);	
 				}
 			}
-		}
-		if (power == power_type.beam) {
-			if(go_right){
-				gameObject.transform.Rotate(0, 0, -180 * Time.deltaTime*2);
-			}
-			else{
-				gameObject.transform.Rotate(0, 0, 180 * Time.deltaTime*2);
-			}
-			if(Time.time > usage){
-				Destroy (this.gameObject);
-			}
-		}
-		if (power == power_type.sing) {
-			gameObject.transform.Translate(0, Time.deltaTime * 3, 0);
-			if(transform.position.y > 4f){
-				Destroy (this.gameObject);
-			}
+		} else if (power == power_type.beam) {
+				if (go_right) {
+						gameObject.transform.Rotate (0, 0, -180 * Time.deltaTime * 2);
+				} else {
+						gameObject.transform.Rotate (0, 0, 180 * Time.deltaTime * 2);
+				}
+				if (Time.time > usage) {
+						Destroy (this.gameObject);
+				}
+		} else if (power == power_type.sing) {
+				gameObject.transform.Translate (0, Time.deltaTime * 3, 0);
+				if (transform.position.y > 4f) {
+						Destroy (this.gameObject);
+				}
+		} else if (power == power_type.spark) {
+				if (Time.time > usage) {
+						Destroy (this.gameObject);
+				}
+		} else if (power == power_type.fire) {
+				if (go_right) {
+					transform.Translate (Time.deltaTime * 2, 0, 0);
+					sprite.SetInteger("Direction", 0);
+				} else {
+					transform.Translate (Time.deltaTime * -2, 0, 0);
+					sprite.SetInteger("Direction", 1);
+				}
+				if (Time.time > usage) {
+					Destroy (this.gameObject);	
+				}
 		}
 	}
 	
@@ -64,7 +79,9 @@ public class Attack : MonoBehaviour {
 		if (col.tag == "Enemy" && power != power_type.sing) {
 			print ("attack");
 			col.gameObject.SetActive (false);
-			Destroy (this.gameObject);
+			if(power == power_type.none){
+				Destroy (this.gameObject);
+			}
 		}
 	}
 }

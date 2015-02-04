@@ -20,6 +20,14 @@ public class Enemy_1 : MonoBehaviour {
 	public float 	speed = 7f;
 	private float distance;
 	public int score = 400; //points earned for destroying
+	public Vector3[] points;
+
+	//Pacing//
+//	public Vector3 start;
+//	public Vector3 pointA;
+//	public Vector3 pointB;
+
+
 	private float usage;
 	private float delay;
 	private Vector3 vel;
@@ -27,8 +35,9 @@ public class Enemy_1 : MonoBehaviour {
 	private RaycastHit hit;
 	private RaycastHit attack_ray;
 	public enemy_state state;
-	public float fieldOfViewRange = 68.0f;
+	private float fieldOfViewRange = 68.0f;
 	private Vector3 rayDir = Vector3.zero;
+	private int index = 0;
 
 	//powers
 	public GameObject beam_string;
@@ -40,7 +49,12 @@ public class Enemy_1 : MonoBehaviour {
 		usage = Time.time + delay;
 		renderer.enabled = false;
 		distance = Mathf.Abs (kirby.position.x - transform.position.x);
+//		start = transform.position;
 		state = enemy_state.wander;
+//		while (true) {
+//			yield return StartCoroutine(state_wander
+//				}
+
 	}
 	
 	// Update is called once per frame
@@ -77,7 +91,6 @@ public class Enemy_1 : MonoBehaviour {
 				Attack();
 				break;
 		}
-
 		if (vel.x < 0) {
 			sprite.SetInteger("Action", 0);	
 		} else {
@@ -86,7 +99,9 @@ public class Enemy_1 : MonoBehaviour {
 		my_obj.vel = vel;
 	}
 
-
+//	IEnumerator MoveObject(Transform thisTransform, Vector3 start, Vector3 endPos, float Time){
+//			
+//			}
 
 	void FixedUpdate(){
 
@@ -99,6 +114,9 @@ public class Enemy_1 : MonoBehaviour {
 			my_obj.acc = Vector3.zero; 
 			my_obj.vel = Vector3.zero; 
 //			my_obj.reached_ground = true; 
+		}
+		if (col.gameObject.tag == "Enemy") {
+			Physics.IgnoreCollision(gameObject.collider, col);
 		}
 //		if (col.gameObject.tag == "Player") {
 //			Kirby kirb = kirby.gameObject.GetComponent<Kirby>();
@@ -130,17 +148,20 @@ public class Enemy_1 : MonoBehaviour {
 	void state_wander(){
 		print ("wandering enemy");
 
-		if (Physics.Raycast (transform.position, rayDir, out hit, 10f)) {
-
+//		if (Physics.Raycast (transform.position, rayDir, out hit, 10f)) {
+//
+//		}
+		int len = points.Length;
+		if (index >= len) {
+			index = 0;		
 		}
-
-		switch (power){
-		case power_type.beam:
-			//wander left
-			vel.x = speed;
-
-			break;
-		}
+		var dir = points[index] - gameObject.transform.position;
+			dir.Normalize();
+			if(gameObject.transform.position != points[0]){
+				vel.x = dir.x * speed; 
+			}
+	//what to do when done pacing?
+//		gameObject.SetActive (false);
 	}
 	
 	void state_chase(){
