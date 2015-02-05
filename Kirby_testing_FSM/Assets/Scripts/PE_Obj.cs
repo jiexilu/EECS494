@@ -101,6 +101,11 @@ public class PE_Obj : MonoBehaviour {
 			if (col.CompareTag("Slope")) {
 				Slope_resolution(col);
 			} else if (col.CompareTag("Pool")) {
+				if (gameObject.CompareTag("Enemy")) {
+					Enemy_1 enemy = gameObject.GetComponent<Enemy_1> ();
+					enemy.hit_water = true; 
+					return;
+				}
 				Water_resolution(col);
 			} else if (PhysEngine.LEQ(y_down, col_y_up))  {
 				//get new position 
@@ -119,6 +124,11 @@ public class PE_Obj : MonoBehaviour {
 				col_dir = Col_dir.right;
 				Slope_resolution(col);
 			} else if (col != ground && !within_x_bound(x_left, x_right, col_x_left, col_x_right)) {
+				if (gameObject.CompareTag("Enemy")) {
+					Enemy_1 enemy = gameObject.GetComponent<Enemy_1> ();
+					enemy.hit_cube = (col.gameObject.CompareTag("Ground")) ? true : false; 
+					enemy.hit_wall = (col.gameObject.CompareTag("Wall")) ? true : false; 
+				}
 				col_dir = Col_dir.right;
 				//get new position 
 				dif_x = Mathf.Abs (x_right - col_x_left);
@@ -133,6 +143,11 @@ public class PE_Obj : MonoBehaviour {
 				col_dir = Col_dir.left;
 				Slope_resolution(col);
 			} else if (col != ground && !within_x_bound(x_left, x_right, col_x_left, col_x_right)) {
+				if (gameObject.CompareTag("Enemy")) {
+					Enemy_1 enemy = gameObject.GetComponent<Enemy_1> ();
+					enemy.hit_cube = (col.gameObject.CompareTag("Ground")) ? true : false; 
+					enemy.hit_wall = (col.gameObject.CompareTag("Wall")) ? true : false; 
+				}
 				col_dir = Col_dir.left;
 				//get new position 
 				dif_x = Mathf.Abs (x_left - col_x_right);
@@ -165,9 +180,22 @@ public class PE_Obj : MonoBehaviour {
 	
 	void Slope_resolution(PE_Obj col) {
 		// How would I make this universal so it applies to the enemies and kirby
-		if (!CompareTag("Player")) return;
-		Kirby kirby = gameObject.GetComponent<Kirby> ();
-		Direction cur_dir = kirby.cur_dir;
+		Direction cur_dir;
+		Vector3 BR;
+		Vector3 BL;
+
+		if (CompareTag("Player")) {
+			Kirby kirby = gameObject.GetComponent<Kirby> ();
+			cur_dir = kirby.cur_dir;
+			BR = kirby.BR.position;
+			BL = kirby.BL.position;
+		} else {
+			if (!CompareTag("Enemy")) return; // error checking
+			Enemy_1 enemy = gameObject.GetComponent<Enemy_1> ();
+			cur_dir = enemy.cur_dir;
+			BR = enemy.BR.position;
+			BL = enemy.BL.position;
+		}
 		Slope_pts col_slope = col.gameObject.GetComponent<Slope_pts> ();
 		float slope_angle = col.transform.eulerAngles.z; 
 		//		print ("euler Angle " + slope_angle);
@@ -178,12 +206,12 @@ public class PE_Obj : MonoBehaviour {
 		if (slope_angle < 90f) {
 			col_p0 = col_slope.TL.position;
 			col_p1 = col_slope.TR.position;
-			p2 = kirby.BR.position;
+			p2 = BR;
 		} else { //  if (slope_angle > 90f) 
 			//			print ("slope angle is greater than 90f");
 			col_p0 = col_slope.BL.position;
 			col_p1 = col_slope.BR.position;
-			p2 = kirby.BL.position;
+			p2 = BL;
 		}
 		
 		Vector3 v1 = col_p1 - col_p0;

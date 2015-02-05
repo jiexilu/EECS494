@@ -57,6 +57,7 @@ public class Kirby : MonoBehaviour {
 	public float water_speed = 2f;
 	public float swim_up_speed = 2f;
 	public bool under_water = false; 
+	public bool at_door = false;
 	
 	public bool has_enemy = false;
 	public power_type power = power_type.none;
@@ -179,7 +180,7 @@ public class Kirby : MonoBehaviour {
 			sprite_kirby.SetInteger ("Action", 2);
 			cur_dir = Direction.right;
 		} 
-		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) {
+		if ((Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) && !at_door) {
 			// up input
 			next_state = State.inhale; 
 		} 
@@ -476,7 +477,7 @@ public class Kirby : MonoBehaviour {
 			sprite_kirby.SetInteger ("Action", 2);
 			cur_dir = Direction.right;
 		} 
-		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) {
+		if ((Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) && !at_door) {
 			// up input
 			next_state = State.inhale; 
 		} 
@@ -683,6 +684,8 @@ public class Kirby : MonoBehaviour {
 			}
 			col.gameObject.SetActive(false);
 			near_enemy = false;
+		} else if (col.gameObject.tag == "door") {
+			at_door = true; 
 		}
 	}
 	
@@ -691,6 +694,8 @@ public class Kirby : MonoBehaviour {
 		my_obj = gameObject.GetComponent<PE_Obj> ();
 		if (col.gameObject.tag == "Ground") {
 			my_obj.ground = null;  
+		} else if (col.gameObject.tag == "door") {
+			at_door = false; 
 		}
 	}
 	

@@ -46,7 +46,16 @@ public class Enemy_1 : MonoBehaviour {
 	public GameObject spark;
 
 	public bool hit_wall = false;
-	
+	public bool hit_cube = false; 
+	public bool hit_water = false;
+
+	public Transform BL, BR;
+
+	void Awake () {
+		BL = transform.Find ("BL");
+		BR = transform.Find ("BR");
+	}
+
 	// Use this for initialization
 	void Start () {
 		my_obj = GetComponent<PE_Obj> ();

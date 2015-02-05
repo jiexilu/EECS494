@@ -20,7 +20,9 @@ public class Door : MonoBehaviour {
 	void OnTriggerStay(Collider col){
 		if (col.gameObject.tag == "Player") {
 			print ("Kirby at door");
-			if(Input.GetKey(KeyCode.UpArrow)){
+			Kirby kirby = col.gameObject.GetComponent<Kirby> ();
+			if((Input.GetKey(KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) 
+			   && (kirby.cur_state == State.stand || kirby.cur_state == State.stand_power)){
 				//Vector3 start = new Vector3(-8.72f,-10.33f, 0f);
 				Vector3 new_pos = doorPort.position; 
 				new_pos.z = 0;
