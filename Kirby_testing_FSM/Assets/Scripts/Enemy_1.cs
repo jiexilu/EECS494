@@ -16,7 +16,7 @@ public class Enemy_1 : MonoBehaviour {
 	public Animator sprite;
 	public Transform kirby;
 	public power_type power;
-	public float speed = 30f;
+	public float speed = 1f;
 	private float distance;
 	public int score = 400; //points earned for destroying
 	
@@ -48,7 +48,7 @@ public class Enemy_1 : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		my_obj = GetComponent<PE_Obj> ();
-		delay = 0.5f;
+		delay = 2f;
 		distance = Mathf.Abs (kirby.position.x - transform.position.x);
 		state = enemy_state.wander;
 		gameObject.renderer.material.color = Color.clear;
@@ -65,30 +65,16 @@ public class Enemy_1 : MonoBehaviour {
 		//if they bump something, change directions or jump
 		rayDir = kirby.position - transform.position;
 		
-		//		if (((Vector3.Angle (rayDir, Vector3.left)) < fieldOfViewRange) || 
-		//		    (Vector3.Angle(rayDir, Vector3.right) < fieldOfViewRange)) {
-		//			if(Physics.Raycast (transform.position, rayDir, out hit, 200f)){
-		//				if(hit.transform.tag == "Player"){
-		//					if(hit.distance < 1f){
-		////						print ("distance " + hit.distance);
-		//						print ("attack state");
-		//						state = enemy_state.attack;
-		//					}
-		//					state = enemy_state.chase;
-		//				}
-		//			}
-		//		}
-		
 		switch (state) {
-		case enemy_state.wander:
-			state_wander();
-			break;
-		case enemy_state.chase:
-			state_chase();
-			break;
-		case enemy_state.attack:
-			Attack();
-			break;
+			case enemy_state.wander:
+				state_wander();
+				break;
+			case enemy_state.chase:
+				state_chase();
+				break;
+			case enemy_state.attack:
+				Attack();
+				break;
 		}
 		
 		if (vel.x < 0) {
@@ -104,32 +90,27 @@ public class Enemy_1 : MonoBehaviour {
 	
 	
 	void OnTriggerEnter(Collider col){
-		if (col.gameObject.tag == "Ground") {
-			// GameObject thePE_Obj = GameObject.Find ("PE_Obj");
-			PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
-			my_obj.acc = Vector3.zero; 
-			my_obj.vel = Vector3.zero; 
-			//			my_obj.reached_ground = true; 
-		}
+//		if (col.gameObject.tag == "Ground") {
+//			// GameObject thePE_Obj = GameObject.Find ("PE_Obj");
+//			PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
+//			my_obj.acc = Vector3.zero; 
+//			my_obj.vel = Vector3.zero; 
+//			//			my_obj.reached_ground = true; 
+//		}
 		if (col.gameObject.tag == "Enemy") {
 			Physics.IgnoreCollision(gameObject.collider, col);
 		}
-		//		if (col.gameObject.tag == "Player") {
-		//			Kirby kirb = kirby.gameObject.GetComponent<Kirby>();
-		//			kirb.Got_Attacked(); 
-		//		}
 	}
 	
 	void Attack(){
+		vel = Vector3.zero;
 		if (!set_delay) {
 			usage = Time.time + delay;		
 			set_delay = true;
 			attack = false;
 		}
-		print ("power " + power);
 		if (Time.time < usage && attack == false) {
-			my_obj.acc = Vector3.zero;
-			my_obj.vel = Vector3.zero;
+			print ("stop moving");
 			switch (power) {
 			case power_type.none: 
 				print ("ENEMY DOES NOTHING");
@@ -158,6 +139,9 @@ public class Enemy_1 : MonoBehaviour {
 	
 	void state_wander(){
 		print ("wandering enemy");
+		if (vel == Vector3.zero) {
+			vel.x = -speed;
+		}
 		if (((Vector3.Angle (rayDir, Vector3.left)) < fieldOfViewRange) || 
 		    (Vector3.Angle(rayDir, Vector3.right) < fieldOfViewRange)) {
 			if(Physics.Raycast (transform.position, rayDir, out hit, 200f)){
@@ -167,15 +151,20 @@ public class Enemy_1 : MonoBehaviour {
 			}
 		}
 		
-		if (Physics.Raycast (transform.position, Vector3.left, out hit, 10f)) {
+		if (Physics.Raycast (transform.position, Vector3.left, out hit)) {
 			if(hit.collider.tag == "Wall" || hit.collider.tag == "Ground"){
-				print ("hit something on left" + gameObject.name);
-				vel.x = speed;
+				print ("hit left wall");
+				if(hit.distance < .25){
+					print ("hit something on left" + gameObject.name);
+					vel.x = speed;
+				}
 			}
-		}if (Physics.Raycast (transform.position, Vector3.right, out hit, 10f)) {
+		}if (Physics.Raycast (transform.position, Vector3.right, out hit)) {
 			if(hit.collider.tag == "Wall" || hit.collider.tag == "Ground"){
-				print ("hit something on right" + gameObject.name);
-				vel.x = -1 * speed;
+				if(hit.distance < .25){
+					print ("hit something on right" + gameObject.name);
+					vel.x = -1 * speed;
+				}
 			}
 		}
 	}
@@ -190,8 +179,7 @@ public class Enemy_1 : MonoBehaviour {
 		    (Vector3.Angle(rayDir, Vector3.right) < fieldOfViewRange)) {
 			if(Physics.Raycast (transform.position, rayDir, out hit, 200f)){
 				if(hit.transform.tag == "Player"){
-					if(hit.distance < 1f){
-						//						print ("distance " + hit.distance);
+					if(hit.distance < 2f){
 						print ("attack state");
 						state = enemy_state.attack;
 					}
@@ -231,7 +219,5 @@ public class Enemy_1 : MonoBehaviour {
 		print ("invisible enemy " + gameObject.name);
 		gameObject.SetActive (false);
 	}
-	
-	
 	
 }

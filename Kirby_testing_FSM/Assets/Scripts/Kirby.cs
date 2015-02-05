@@ -65,6 +65,7 @@ public class Kirby : MonoBehaviour {
 	public Direction cur_dir = Direction.right;
 	public float life = 4f;
 	public int health = 6;
+	private bool attacking = false;
 	
 	public State prev_state = State.stand;
 	public State cur_state = State.stand; 
@@ -500,63 +501,64 @@ public class Kirby : MonoBehaviour {
 	}
 	
 	void state_use_power() {
+		vel = Vector3.zero;
 		if (!set_attack_delay) {
-			vel.x = 0;
-			attack_usage = Time.time + attack_delay;		
-			print ("Kirby attacks with power!");
-			set_attack_delay = true;
-			switch (power) {
-			case power_type.none: 
-				print ("NOTHING");
-				break;
-			case power_type.beam:
-				print ("BEAM");
-				GameObject projectile = Instantiate (beam) as GameObject;
-				projectile.transform.position = transform.position;
-				Attack beam_power = projectile.GetComponent<Attack> ();
-				beam_power.kirby = true;
-				beam_power.go_right = (cur_dir == Direction.right) ? true : false;
-				beam_power.poof = true;
-				break;
-			case power_type.fire:
-				print ("FIRE");
-				GameObject fire = Instantiate (fireball) as GameObject;
-				fire.transform.position = transform.position;
-				Attack fire_power = fire.GetComponent<Attack> ();
-				fire_power.kirby = true;
-				fire_power.go_right = (cur_dir == Direction.right) ? true : false;		
-				fire_power.poof = true;
-				break;
-			case power_type.spark:
-				sprite_kirby.SetInteger("Action", 24);	
-				GameObject sparks = Instantiate (spark) as GameObject;
-				sparks.transform.position = transform.position;
-				Attack spark_power = sparks.GetComponent<Attack> ();
-				spark_power.kirby = true;
-				spark_power.go_right = (cur_dir == Direction.right) ? true : false;		
-				spark_power.poof = true;
-				print ("SPARK");
-				break;
-			case power_type.sing:
-				print ("SING!");
-				if (cur_dir == Direction.right) {
-					sprite_kirby.SetInteger ("Action", 14);
-				} else if (cur_dir == Direction.left) {
-					sprite_kirby.SetInteger ("Action", 15);
-				}
-				GameObject notes = Instantiate (musicNotes) as GameObject;
-				notes.transform.position = transform.position;
-				Attack sing_power = notes.GetComponent<Attack> ();	
-				sing_power.kirby = true;
-				sing_power.go_right = (cur_dir == Direction.right) ? true : false;
-				sing_power.poof = true;
-				cam.music_power = true;
-				GameObject bubble = Instantiate(musicBubble) as GameObject;
-				bubble.transform.position = transform.position;
-				break;
-			}
+				attack_usage = Time.time + attack_delay;		
+				print ("Kirby attacks with power!");
+				set_attack_delay = true;
 		}
-		//TODO: while attacking, don't change states
+		if (Time.time < usage && attacking == false) {
+				switch (power) {
+				case power_type.none: 
+						print ("NOTHING");
+						break;
+				case power_type.beam:
+						print ("BEAM");
+						GameObject projectile = Instantiate (beam) as GameObject;
+						projectile.transform.position = transform.position;
+						Attack beam_power = projectile.GetComponent<Attack> ();
+						beam_power.kirby = true;
+						beam_power.go_right = (cur_dir == Direction.right) ? true : false;
+						beam_power.poof = true;
+						break;
+				case power_type.fire:
+						print ("FIRE");
+						GameObject fire = Instantiate (fireball) as GameObject;
+						fire.transform.position = transform.position;
+						Attack fire_power = fire.GetComponent<Attack> ();
+						fire_power.kirby = true;
+						fire_power.go_right = (cur_dir == Direction.right) ? true : false;		
+						fire_power.poof = true;
+						break;
+				case power_type.spark:
+						sprite_kirby.SetInteger ("Action", 24);	
+						GameObject sparks = Instantiate (spark) as GameObject;
+						sparks.transform.position = transform.position;
+						Attack spark_power = sparks.GetComponent<Attack> ();
+						spark_power.kirby = true;
+						spark_power.go_right = (cur_dir == Direction.right) ? true : false;		
+						spark_power.poof = true;
+						print ("SPARK");
+						break;
+				case power_type.sing:
+						print ("SING!");
+						if (cur_dir == Direction.right) {
+								sprite_kirby.SetInteger ("Action", 14);
+						} else if (cur_dir == Direction.left) {
+								sprite_kirby.SetInteger ("Action", 15);
+						}
+						GameObject notes = Instantiate (musicNotes) as GameObject;
+						notes.transform.position = transform.position;
+						Attack sing_power = notes.GetComponent<Attack> ();	
+						sing_power.kirby = true;
+						sing_power.go_right = (cur_dir == Direction.right) ? true : false;
+						sing_power.poof = true;
+						cam.music_power = true;
+						GameObject bubble = Instantiate (musicBubble) as GameObject;
+						bubble.transform.position = transform.position;
+						break;
+				}
+		}
 		if (Time.time > attack_usage) {
 			cam.music_power = false;
 			next_state = State.stand_power;
