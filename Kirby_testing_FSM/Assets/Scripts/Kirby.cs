@@ -49,7 +49,7 @@ public class Kirby : MonoBehaviour {
 	public float attack_usage;
 	public float delay;
 	public float slide_delay = 0.5f;
-	public float attack_delay = 5f;
+	public float attack_delay = 1f; //set in unity
 	public bool set_delay = false; 
 	public bool set_attack_delay = false;
 	public bool set_paralyzed_delay = false;
@@ -501,13 +501,16 @@ public class Kirby : MonoBehaviour {
 	}
 	
 	void state_use_power() {
-		vel = Vector3.zero;
 		if (!set_attack_delay) {
 				attack_usage = Time.time + attack_delay;		
 				print ("Kirby attacks with power!");
 				set_attack_delay = true;
+				attacking = false;
 		}
-		if (Time.time < usage && attacking == false) {
+		if (Time.time < attack_usage) {
+			vel = Vector3.zero;
+		}
+		if (Time.time < attack_usage && attacking == false) {
 				switch (power) {
 				case power_type.none: 
 						print ("NOTHING");
@@ -558,6 +561,7 @@ public class Kirby : MonoBehaviour {
 						bubble.transform.position = transform.position;
 						break;
 				}
+			attacking = true;
 		}
 		if (Time.time > attack_usage) {
 			cam.music_power = false;

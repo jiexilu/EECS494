@@ -44,6 +44,8 @@ public class Enemy_1 : MonoBehaviour {
 	public GameObject beam_string;
 	public GameObject fireball;
 	public GameObject spark;
+
+	public bool hit_wall = false;
 	
 	// Use this for initialization
 	void Start () {
@@ -150,23 +152,29 @@ public class Enemy_1 : MonoBehaviour {
 				}
 			}
 		}
-		
-		if (Physics.Raycast (transform.position, Vector3.left, out hit)) {
-			if(hit.collider.tag == "Wall" || hit.collider.tag == "Ground"){
-				print ("hit left wall");
-				if(hit.distance < .25){
-					print ("hit something on left" + gameObject.name);
-					vel.x = speed;
-				}
-			}
-		}if (Physics.Raycast (transform.position, Vector3.right, out hit)) {
-			if(hit.collider.tag == "Wall" || hit.collider.tag == "Ground"){
-				if(hit.distance < .25){
-					print ("hit something on right" + gameObject.name);
-					vel.x = -1 * speed;
-				}
-			}
+
+		if (hit_wall) {
+			vel.x = -vel.x;		
 		}
+//		if (Physics.Raycast (transform.position, Vector3.left, out hit, 5f)) {
+//			if(hit.collider.tag == "Wall" || hit.collider.tag == "Ground"){
+//				print ("hit left wall");
+//				hit_wall = true;
+//				if(hit.distance < .25){
+//					print ("hit something on left" + gameObject.name);
+//
+//					vel.x = speed;
+//				}
+//			}
+//		}if (Physics.Raycast (transform.position, Vector3.right, out hit, 5f)) {
+//			if(hit.collider.tag == "Wall" || hit.collider.tag == "Ground"){
+//				print ("hit right wall");
+//				if(hit.distance < .25){
+//					print ("hit something on right" + gameObject.name);
+//					vel.x = -speed;
+//				}
+//			}
+//		}
 	}
 	
 	void state_chase(){
