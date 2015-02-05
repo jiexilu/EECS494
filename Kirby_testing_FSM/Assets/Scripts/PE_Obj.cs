@@ -32,11 +32,7 @@ public class PE_Obj : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider other) {
 		if (still) return;
-
-		if (this.gameObject.name == "Kirby") {
-			print("Stop");
-		}
-
+		
 		PE_Obj otherPEO = other.GetComponent<PE_Obj>();
 		if (otherPEO == null) return;
 		
@@ -113,19 +109,17 @@ public class PE_Obj : MonoBehaviour {
 				next_pos.y += dif_y;
 				//set velocity to zero
 				vel.y = 0f;
-				if (ground == null) {
-					ground = col; 
-				}
+				ground = col; 
 			}
 		}
 		
 		// collision to the right of kirby
-		if (vel.x > 0 && col != ground && !within_x_bound(x_left, x_right, col_x_left, col_x_right)) {  
-			col_dir = Col_dir.right;
+		if (vel.x > 0) {  
 			if (col.CompareTag("Slope")) {
-				//				print ("slope col right");
+				col_dir = Col_dir.right;
 				Slope_resolution(col);
-			} else {
+			} else if (col != ground && !within_x_bound(x_left, x_right, col_x_left, col_x_right)) {
+				col_dir = Col_dir.right;
 				//get new position 
 				dif_x = Mathf.Abs (x_right - col_x_left);
 				//set new position 
@@ -133,13 +127,13 @@ public class PE_Obj : MonoBehaviour {
 				//set velocity to zero
 				vel.x = 0f;
 			}
-		} else if (vel.x < 0 && col != ground && !within_x_bound(x_left, x_right, col_x_left, col_x_right)) {
-			col_dir = Col_dir.left; 
+		} else if (vel.x < 0) { 
 			// collision to the left of kirby
 			if (col.CompareTag("Slope")) {
-				//				print ("slope col left");
-				//Slope_resolution(col);
-			} else {
+				col_dir = Col_dir.left;
+				Slope_resolution(col);
+			} else if (col != ground && !within_x_bound(x_left, x_right, col_x_left, col_x_right)) {
+				col_dir = Col_dir.left;
 				//get new position 
 				dif_x = Mathf.Abs (x_left - col_x_right);
 				//set new position 
@@ -147,7 +141,9 @@ public class PE_Obj : MonoBehaviour {
 				//set velocity to zero
 				vel.x = 0f;
 			}
-		} else if (col_x_left == x_right || col_x_right == x_left) {
+		} else if (vel.x < 0 && col.CompareTag("Slope")) {
+			print ("This is my ground " + col.gameObject.name);
+		}else if (col_x_left == x_right || col_x_right == x_left) {
 			vel.x = 0f; 
 		}
 		
@@ -174,7 +170,7 @@ public class PE_Obj : MonoBehaviour {
 		Direction cur_dir = kirby.cur_dir;
 		Slope_pts col_slope = col.gameObject.GetComponent<Slope_pts> ();
 		float slope_angle = col.transform.eulerAngles.z; 
-		print ("euler Angle " + slope_angle);
+		//		print ("euler Angle " + slope_angle);
 		Vector3 col_p0; // bottom point on slope
 		Vector3 col_p1; // top point on slope
 		Vector3 p2; // object intersect position
@@ -184,7 +180,7 @@ public class PE_Obj : MonoBehaviour {
 			col_p1 = col_slope.TR.position;
 			p2 = kirby.BR.position;
 		} else { //  if (slope_angle > 90f) 
-			print ("slope angle is greater than 90f");
+			//			print ("slope angle is greater than 90f");
 			col_p0 = col_slope.BL.position;
 			col_p1 = col_slope.BR.position;
 			p2 = kirby.BL.position;
@@ -214,9 +210,9 @@ public class PE_Obj : MonoBehaviour {
 		Debug.DrawLine (p2, x_movement, Color.yellow, 10f);
 		Debug.DrawLine (p2, y_movement, Color.blue, 10f);
 		
-		print ("X dist " + x_dist);
-		print ("Y dist " + y_dist);
-		print ("current pos " + next_pos);
+		//		print ("X dist " + x_dist);
+		//		print ("Y dist " + y_dist);
+		//		print ("current pos " + next_pos);
 		if (slope_angle < 90f && cur_dir == Direction.right) {
 			next_pos.y += y_dist;
 		} else if (slope_angle < 90f && cur_dir == Direction.left) {
@@ -227,7 +223,7 @@ public class PE_Obj : MonoBehaviour {
 			next_pos.y += y_dist;
 		}
 		
-		print ("new pos " + next_pos);
+		//		print ("new pos " + next_pos);
 		//set velocity to zero
 		vel.y = 0f;
 		ground = col; 
