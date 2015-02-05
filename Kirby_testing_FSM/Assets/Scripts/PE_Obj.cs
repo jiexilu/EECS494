@@ -60,10 +60,6 @@ public class PE_Obj : MonoBehaviour {
 		}
 	}
 	
-	void Update() {
-		
-	}
-	
 	void ResolveCollisionWith(PE_Obj col) {
 		next_pos = cur_pos;
 		
@@ -88,7 +84,11 @@ public class PE_Obj : MonoBehaviour {
 		// differences in position
 		float dif_x = 0f;
 		float dif_y = 0f;
-		
+
+		if (col.CompareTag("Ground") && CompareTag("Player")) {
+			print ("I'm colliding with ground");
+		}
+
 		// collision up of kirby
 		if (vel.y > 0 && PhysEngine.GEQ(y_up, col_y_down)) {
 			//get new position 
@@ -97,7 +97,10 @@ public class PE_Obj : MonoBehaviour {
 			next_pos.y -= dif_y;
 			//set velocity to zero
 			vel.y = 0f;
-		} else if (vel.y < 0) { // collision on the bottom of kirby
+		} else if (vel.y <= 0) { // collision on the bottom of kirby
+//			if (CompareTag("Player")) {
+//				print("stop");
+//			}
 			if (col.CompareTag("Slope")) {
 				Slope_resolution(col);
 			} else if (col.CompareTag("Pool")) {
@@ -156,9 +159,7 @@ public class PE_Obj : MonoBehaviour {
 				//set velocity to zero
 				vel.x = 0f;
 			}
-		} else if (vel.x < 0 && col.CompareTag("Slope")) {
-			print ("This is my ground " + col.gameObject.name);
-		}else if (col_x_left == x_right || col_x_right == x_left) {
+		} else if (col_x_left == x_right || col_x_right == x_left) {
 			vel.x = 0f; 
 		}
 		

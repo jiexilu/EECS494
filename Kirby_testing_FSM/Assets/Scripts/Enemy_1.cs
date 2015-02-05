@@ -20,14 +20,9 @@ public class Enemy_1 : MonoBehaviour {
 	private float distance;
 	public int score = 400; //points earned for destroying
 	
-	//Pacing//
-	//	public Vector3 start;
-	//	public Vector3 pointA;
-	//	public Vector3 pointB;
-	
-	
 	private float usage;
 	private float delay;
+	private float delay_until_attack = 3f; 
 	private Vector3 vel;
 	private PE_Obj my_obj;
 	private RaycastHit hit;
@@ -38,7 +33,8 @@ public class Enemy_1 : MonoBehaviour {
 	private int index = 0;
 	public Direction cur_dir = Direction.left;
 	public bool set_delay = false;
-	public bool attack = false;
+	public bool attack = true;
+	public float dist_until_chase = 4f;
 	
 	//powers
 	public GameObject beam_string;
@@ -51,6 +47,7 @@ public class Enemy_1 : MonoBehaviour {
 
 	public Transform BL, BR;
 
+
 	void Awake () {
 		BL = transform.Find ("BL");
 		BR = transform.Find ("BR");
@@ -59,13 +56,19 @@ public class Enemy_1 : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		my_obj = GetComponent<PE_Obj> ();
-		delay = 2f;
+		delay = 0.5f;
 		distance = Mathf.Abs (kirby.position.x - transform.position.x);
 		state = enemy_state.wander;
 		gameObject.renderer.material.color = Color.clear;
 		vel = my_obj.vel;
 		vel.x = -speed;
 		my_obj.vel = vel;
+		if (name == "BrontoBurt") {
+			my_obj.grav = PE_GravType.none;
+			vel.x = -speed*2;
+			vel.y = speed*2;
+			my_obj.vel = vel; 
+		}
 	}
 	
 	// Update is called once per frame
@@ -74,7 +77,17 @@ public class Enemy_1 : MonoBehaviour {
 		vel = my_obj.vel; 
 		//		-------
 		//if they bump something, change directions or jump
-		rayDir = kirby.position - transform.position;
+		//rayDir = kirby.position - transform.position;
+
+		if (hit_wall || hit_water) {
+			gameObject.SetActive(false); 
+		}
+
+		if (name == "BrontoBurt") {
+			BrontoBurt_mvmt();
+			my_obj.vel = vel;
+			return;
+		}
 		
 		switch (state) {
 			case enemy_state.wander:
@@ -101,13 +114,6 @@ public class Enemy_1 : MonoBehaviour {
 	
 	
 	void OnTriggerEnter(Collider col){
-//		if (col.gameObject.tag == "Ground") {
-//			// GameObject thePE_Obj = GameObject.Find ("PE_Obj");
-//			PE_Obj my_obj = gameObject.GetComponent<PE_Obj> ();
-//			my_obj.acc = Vector3.zero; 
-//			my_obj.vel = Vector3.zero; 
-//			//			my_obj.reached_ground = true; 
-//		}
 		if (col.gameObject.tag == "Enemy") {
 			Physics.IgnoreCollision(gameObject.collider, col);
 		}
@@ -118,9 +124,8 @@ public class Enemy_1 : MonoBehaviour {
 		if (!set_delay) {
 			usage = Time.time + delay;		
 			set_delay = true;
-			attack = false;
 		}
-		if (Time.time < usage && attack == false) {
+		if (Time.time < usage && attack) {
 			print ("stop moving");
 			switch (power) {
 			case power_type.none: 
@@ -139,7 +144,7 @@ public class Enemy_1 : MonoBehaviour {
 				Spark();
 				break;
 			}
-			attack = true;
+			attack = false;
 		}
 		//set timer
 		if (Time.time > usage) {
@@ -147,61 +152,63 @@ public class Enemy_1 : MonoBehaviour {
 			set_delay = false;
 		}
 	}
+
+	void BrontoBurt_mvmt() {
+		Camera_follow cam = Camera.main.GetComponent<Camera_follow> ();
+		float max = cam.transform.position.y + 2.5f; 
+		float min = cam.transform.position.y;
+		if (transform.position.y > (max - 0.1f)) {
+			vel.y = -speed*2;
+		} else if (transform.position.y < (min + 0.1f)) {
+			vel.y = speed*2; 
+		}
+	}
 	
 	void state_wander(){
-		print ("wandering enemy");
+		//print ("wandering enemy");
+		if (!set_delay && !attack) {
+			usage = Time.time + delay_until_attack;		
+			set_delay = true;
+		} 
+		if (Time.time > usage) {
+			attack = true; 
+			set_delay = false; 
+		}
+
 		if (vel == Vector3.zero) {
 			vel.x = -speed;
 		}
-		if (((Vector3.Angle (rayDir, Vector3.left)) < fieldOfViewRange) || 
-		    (Vector3.Angle(rayDir, Vector3.right) < fieldOfViewRange)) {
-			if(Physics.Raycast (transform.position, rayDir, out hit, 200f)){
-				if(hit.transform.tag == "Player"){
-					state = enemy_state.chase;
-				}
-			}
+
+		if (hit_cube) {
+			vel.x = -vel.x;	
+			hit_cube = false; 
 		}
 
-		if (hit_wall) {
-			vel.x = -vel.x;		
+		if (Mathf.Abs(Vector3.Distance(transform.position, kirby.position)) < dist_until_chase 
+		    && attack) {
+			state = enemy_state.chase;
 		}
-//		if (Physics.Raycast (transform.position, Vector3.left, out hit, 5f)) {
-//			if(hit.collider.tag == "Wall" || hit.collider.tag == "Ground"){
-//				print ("hit left wall");
-//				hit_wall = true;
-//				if(hit.distance < .25){
-//					print ("hit something on left" + gameObject.name);
-//
-//					vel.x = speed;
-//				}
-//			}
-//		}if (Physics.Raycast (transform.position, Vector3.right, out hit, 5f)) {
-//			if(hit.collider.tag == "Wall" || hit.collider.tag == "Ground"){
-//				print ("hit right wall");
-//				if(hit.distance < .25){
-//					print ("hit something on right" + gameObject.name);
-//					vel.x = -speed;
-//				}
-//			}
-//		}
+
 	}
-	
+
 	void state_chase(){
-		print ("chasing kirby");
-		Vector3 temp = rayDir;
-		temp.Normalize ();
-		vel.x = temp.x * speed;
-		
-		if (((Vector3.Angle (rayDir, Vector3.left)) < fieldOfViewRange) || 
-		    (Vector3.Angle(rayDir, Vector3.right) < fieldOfViewRange)) {
-			if(Physics.Raycast (transform.position, rayDir, out hit, 200f)){
-				if(hit.transform.tag == "Player"){
-					if(hit.distance < 2f){
-						print ("attack state");
-						state = enemy_state.attack;
-					}
-				}
-			}
+		//print ("chasing kirby");
+
+		float dist_to_kirby = Vector3.Distance (transform.position, kirby.position);
+
+		if (Mathf.Abs(dist_to_kirby) < dist_until_chase && transform.position.x > kirby.position.x) {
+			//print ("Kirby to left");
+			vel.x = -speed;
+		} else if (Mathf.Abs(dist_to_kirby) < dist_until_chase && transform.position.x < kirby.position.x) {
+			//print ("Kirby to right");
+			vel.x = speed;
+		} else {
+			//print ("back to wander");
+			state = enemy_state.wander;
+		}
+
+		if (Mathf.Abs(dist_to_kirby) < 2f) {
+			state = enemy_state.attack;
 		}
 	}
 	
