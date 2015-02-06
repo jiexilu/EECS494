@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public enum prof_state{
-	walk, shout, toss, fall
-}
+
 
 public class ProfBoss : MonoBehaviour {
 

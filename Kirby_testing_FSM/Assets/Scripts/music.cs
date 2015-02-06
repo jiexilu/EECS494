@@ -17,7 +17,7 @@ public class music : MonoBehaviour {
 
 	void OnTriggerEnter(Collider col) {
 		if (col.tag == "Player") {
-			kirby.power = power_type.sing;
+//			kirby.power = power_type.sing;
 			kirby.cur_state = State.stand_power;
 			gameObject.SetActive(false);
 		}

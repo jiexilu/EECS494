@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum prof_state{
+	walk, shout, toss, fall, paused
+}
+
 public class bossProf : MonoBehaviour {
 
 	public Transform kirby;
@@ -16,6 +20,7 @@ public class bossProf : MonoBehaviour {
 	public GameObject pointA;
 	public GameObject pointB;
 	public int life = 10;
+	public GUIText txt;
 
 	//attack stuff
 	public bool set_delay = false;
@@ -25,18 +30,28 @@ public class bossProf : MonoBehaviour {
 	public GameObject Fs;
 
 	public bool ready = false;
+	public bool pause_attacked = false;
+	public bool prev_pause = false;
 
 	// Use this for initialization
 	void Start () {
 		gameObject.transform.position = pointA.transform.position;
 		my_obj = GetComponent<PE_Obj> ();
 		delay = 2f;
-		prof_state cur_state = prof_state.walk;
 		usage = Time.time + delay;
+		txt.color = Color.clear;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
+		if (life < 1) {
+			txt.text = "YOU WIN!";		
+		}
+		string blah = "Boss life " + life;
+		txt.text = blah;
+		print (blah);
+
 		vel = my_obj.vel;
 		
 		switch (cur_state) {
@@ -49,12 +64,16 @@ public class bossProf : MonoBehaviour {
 			case prof_state.shout:
 				state_shout ();
 				break;
+			case prof_state.paused:
+				Pause();
+				break;
 			case prof_state.fall:
 				break;
 		}
 		my_obj.vel = vel;
 		
 		if (Time.time > usage && ready) {
+			txt.color = Color.white;
 			cur_state = Random.value < .5 ? prof_state.toss : prof_state.shout;
 		}
 
@@ -67,20 +86,28 @@ public class bossProf : MonoBehaviour {
 					cur_dir = Direction.right;
 			}
 		}
+		if (pause_attacked != prev_pause) {
+			if (pause_attacked) {
+				cur_state = prof_state.paused;
+			}
+			else{
+				cur_state = prof_state.walk;
+			}
+		}
+		prev_pause = pause_attacked;
 	}
 	
 	void state_walk(){
-		print ("walk prof");
+//		print ("walk prof");
 		if (vel == Vector3.zero) {
-			print ("zilch");
 			vel.x = Random.Range (speed, -speed);		
 		}
 		if (gameObject.transform.position.x < pointA.transform.position.x) {
-			print ("A");
+//			print ("A");
 			vel.x = -vel.x;		
 		}
 		if (gameObject.transform.position.x > pointB.transform.position.x) {
-			print ("B");
+//			print ("B");
 			vel.x = -vel.x;		
 		}
 	}
@@ -94,7 +121,7 @@ public class bossProf : MonoBehaviour {
 		vel.y = speed;
 		usage = Time.time + toss_delay;
 		if (Time.time < toss_usage) {
-			print ("toss prof");
+//			print ("toss prof");
 			sprite.SetInteger("Action", 2);	
 			foreach(var lit in books){
 				book_spawn paper = lit.GetComponent<book_spawn>();
@@ -113,22 +140,13 @@ public class bossProf : MonoBehaviour {
 	}
 
 	void state_shout(){
-		print ("shout");
 		if (!set_delay) {
 			toss_usage = Time.time + .25f;
 			set_delay = true;
 			print ("shout prof");
 			sprite.SetInteger("Action", 2);	
 			GameObject projectile = Instantiate (Fs) as GameObject;
-			projectile.transform.position = transform.position;
-//			projectile.transform.LookAt(kirby);
-			projectile.transform.Translate(kirby.position * Time.deltaTime * 5f);
-		}
-		if (Time.time < toss_usage) {
-			GameObject projectile = Instantiate (Fs) as GameObject;
-			projectile.transform.position = transform.position;
-			//			projectile.transform.LookAt(kirby);
-			projectile.transform.Translate(kirby.position * Time.deltaTime * 5f);
+			projectile.transform.Translate (Time.deltaTime * 4, 0, 0);
 		}
 		usage = Time.time + delay;
 		vel = Vector3.zero;
@@ -144,5 +162,9 @@ public class bossProf : MonoBehaviour {
 		if (col.gameObject.tag == "Attack") {
 			life--;
 		}				
+	}
+
+	void Pause(){
+		vel = Vector3.zero;
 	}
 }

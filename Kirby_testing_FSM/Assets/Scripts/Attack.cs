@@ -50,12 +50,7 @@ public class Attack : MonoBehaviour {
 			if (Time.time > usage) {
 				Destroy (this.gameObject);
 			}
-		} else if (power == power_type.sing) {
-			gameObject.transform.Translate (0, Time.deltaTime * 3, 0);
-			if (transform.position.y > 4f) {
-				Destroy (this.gameObject);
-			}
-		} else if (power == power_type.spark) {
+		}else if (power == power_type.spark) {
 			if (Time.time > usage) {
 				Destroy (this.gameObject);
 			}

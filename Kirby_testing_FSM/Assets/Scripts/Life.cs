@@ -21,5 +21,8 @@ public class Life : MonoBehaviour {
 		} else if (kirby.life == 1) {
 			life.SetInteger ("Numbers", 1);
 		}
+		else if (kirby.life == 0) {
+			life.SetInteger ("Numbers", 0);
+		}
 	}
 }

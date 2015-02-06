@@ -7,9 +7,12 @@ public class Camera_follow : MonoBehaviour {
 	public Transform target;
 	public RaycastHit rHit;
 	public int cur_level = 1;
-	public bool music_power = false;
+	public bool pause_power = false;
 
 	public  GameObject prof;
+	public GameObject[] enemies;
+	public GameObject[] bossPowers;
+	private bool prev_pause = false;
 
 	void Awake(){
 
@@ -17,10 +20,13 @@ public class Camera_follow : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		enemies = GameObject.FindGameObjectsWithTag("Enemy");
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		bossPowers = GameObject.FindGameObjectsWithTag ("bossPower");
+
 		Vector3 tp = transform.position;
 		tp.x = target.position.x;
 		if (target.position.x < -5.14f) {
@@ -81,9 +87,37 @@ public class Camera_follow : MonoBehaviour {
 				}
 				break;
 		}
-
 		transform.position = tp;
+		if (pause_power) {
+			print ("pause is ture");		
+		}
+		if(prev_pause != pause_power){
+			print ("pause power changed");
+			foreach(var x in enemies){
+				Enemy_1 bully = x.GetComponent<Enemy_1>();
+				if(bully == null){
+					print ("wtf " + x.name);
+				}
+				bully.pause_attacked = pause_power;
+			}
 
+			if(bossPowers.Length > 0){
+				foreach(var y in bossPowers){
+				 //freeze the power in midair
+					book booky = y.GetComponent<book>();
+					if(booky == null){
+						print ("huh? " + y.name);
+					}
+					else{
+						booky.pause_attacked = pause_power;
+					}
+				}
+			}
+			bossProf bossy = prof.GetComponent<bossProf>();
+			bossy.pause_attacked = true;
+		}
+
+		prev_pause = pause_power;
 	}
 
 }

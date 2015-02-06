@@ -6,7 +6,7 @@ public class book_spawn : MonoBehaviour {
 	public GameObject bookPrefab;
 	public bool trigger = false;
 	public bool set_delay = false;
-	private float toss_delay = .5f;
+	private float toss_delay = .75f;
 	private float toss_usage;
 	public int count = 0;
 

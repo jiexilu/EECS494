@@ -25,10 +25,10 @@ public class Door : MonoBehaviour {
 			   && (kirby.cur_state == State.stand || kirby.cur_state == State.stand_power)){
 				Camera_follow cam = main_camera.GetComponent<Camera_follow>();
 				cam.cur_level = next_level;
-				if (cam.cur_level == 4) {
-					Application.LoadLevel(2);
-					return;
-				}
+//				if (cam.cur_level == 4 ) {
+//					Application.LoadLevel(2);
+//					return;
+//				}
 				kirby.going_through_door = true;
 				//Vector3 start = new Vector3(-8.72f,-10.33f, 0f);
 				Vector3 new_pos = doorPort.position; 

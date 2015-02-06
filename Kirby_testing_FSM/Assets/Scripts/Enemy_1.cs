@@ -2,11 +2,11 @@
 using System.Collections;
 
 public enum power_type{
-	none, spark, beam, fire, star, sing, ouch
+	none, spark, beam, fire, star, pause, ouch
 }
 
 public enum enemy_state{
-	wander, chase, attack
+	wander, chase, attack, paused
 }
 
 //TODO: adjust velocities not their positions
@@ -29,7 +29,6 @@ public class Enemy_1 : MonoBehaviour {
 	private RaycastHit attack_ray;
 	public enemy_state state;
 	private float fieldOfViewRange = 68.0f;
-	private Vector3 rayDir = Vector3.zero;
 	private int index = 0;
 	public Direction cur_dir = Direction.left;
 	public bool set_delay = false;
@@ -46,6 +45,9 @@ public class Enemy_1 : MonoBehaviour {
 	public bool hit_water = false;
 
 	public Transform BL, BR;
+
+	public bool pause_attacked = false;
+	private bool prev_pause = false;
 
 
 	void Awake () {
@@ -73,11 +75,18 @@ public class Enemy_1 : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+		if (pause_attacked != prev_pause) {
+			if(pause_attacked){
+				state = enemy_state.paused;
+			}
+			else{
+				state = enemy_state.wander;
+			}
+		} 
+
 		//Basic movement to the right
 		vel = my_obj.vel; 
-		//		-------
-		//if they bump something, change directions or jump
-		//rayDir = kirby.position - transform.position;
 
 		if (hit_wall || hit_water) {
 			gameObject.SetActive(false); 
@@ -99,6 +108,9 @@ public class Enemy_1 : MonoBehaviour {
 			case enemy_state.attack:
 				Attack();
 				break;
+			case enemy_state.paused:
+				paused();	
+				break;
 		}
 		
 		if (vel.x < 0) {
@@ -110,6 +122,7 @@ public class Enemy_1 : MonoBehaviour {
 		}
 		
 		my_obj.vel = vel;
+		prev_pause = pause_attacked;
 	}
 	
 	
@@ -177,6 +190,7 @@ public class Enemy_1 : MonoBehaviour {
 
 		if (vel == Vector3.zero) {
 			vel.x = -speed;
+			vel.y = -speed;
 		}
 
 		if (hit_cube) {
@@ -238,10 +252,16 @@ public class Enemy_1 : MonoBehaviour {
 		spark_power.go_right = (cur_dir == Direction.right) ? true : false;		
 		spark_power.poof = true;
 	}
+
+	void paused(){
+		print ("enemy is paused");
+		vel = Vector3.zero;
+	}
 	
 	void OnBecameInvisible(){
 		print ("invisible enemy " + gameObject.name);
 		gameObject.SetActive (false);
 	}
 	
+
 }

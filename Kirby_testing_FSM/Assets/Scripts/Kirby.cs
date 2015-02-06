@@ -18,7 +18,8 @@ public enum State {
 	stand_water, 
 	stand_enemy, 
 	stand_power,
-	use_power
+	use_power, 
+	pause_power
 }
 
 
@@ -27,7 +28,7 @@ public class Kirby : MonoBehaviour {
 	public bool God_mode = false;
 	public GameObject kirby_spawner;
 	public GameObject musicNotes;
-	public GameObject musicBubble;
+	public GameObject musicBubble; 
 	public GameObject puffBall_prefab;
 	public GameObject star;
 	public GameObject beam;
@@ -35,6 +36,7 @@ public class Kirby : MonoBehaviour {
 	public GameObject fireball;
 	public Animator sprite_kirby;
 	public Camera_follow cam;
+	public GameObject camera;
 	public BoxCollider box;  
 	
 	public Vector3 vel;
@@ -46,11 +48,14 @@ public class Kirby : MonoBehaviour {
 	public float max_jump_speed = 8f; 
 	public bool reached_ground = false; 
 	public float usage;
+	public float pause_usage;
 	public float attack_usage;
+	public float suck_usage;
 	public float delay;
 	public float slide_delay = 0.5f;
 	public float attack_delay = 1f; //set in unity
 	public bool set_delay = false; 
+	public bool set_pause_delay = false;
 	public bool set_attack_delay = false;
 	public bool set_paralyzed_delay = false;
 	public float slide_x = 0.5f;
@@ -60,6 +65,7 @@ public class Kirby : MonoBehaviour {
 	public bool going_through_door = false;
 	public float door_delay = 0.05f;
 	public Vector3 next_door_pos;
+	public bool has_pause = false;
 	
 	public bool has_enemy = false;
 	public power_type power = power_type.none;
@@ -82,6 +88,8 @@ public class Kirby : MonoBehaviour {
 	private Vector3 standing_box_size = new Vector3(1f, 1f, 1f);
 	private Vector3 duck_box_size = new Vector3(1f, 0.5f, 1f);
 	private Vector3 slide_box_size = new Vector3(2f, 1f, 1f);
+
+	public bool spawn = false;
 	
 	public Transform BL, BR;
 	
@@ -94,11 +102,19 @@ public class Kirby : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		my_obj = GetComponent<PE_Obj> ();
+		cam = camera.GetComponent<Camera_follow>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if (spawn) {
+			Vector3 temp = kirby_spawner.transform.position;
+			temp.z = 0;
+			transform.position = temp;
+			print ("kirb");
+			spawn = false;
+		}
+		print ("Kirby cur-state: " + cur_state);
 		vel = my_obj.vel;
 		if (under_water && !my_obj.is_under_water) {
 			print ("curstate inhale");
@@ -108,6 +124,16 @@ public class Kirby : MonoBehaviour {
 			cur_state = State.stand_water;
 		}
 		under_water = my_obj.is_under_water; 
+
+		if (Input.GetKeyDown (KeyCode.P) && has_pause) {
+			PausePower();
+		}
+
+		if (cam.pause_power && Time.time > pause_usage) {
+			print ("unpause");
+			cam.pause_power = false;
+			set_pause_delay = false;	
+		}
 		
 		//print (vel);
 		reached_ground = (my_obj.ground != null);
@@ -174,6 +200,9 @@ public class Kirby : MonoBehaviour {
 		case State.stand_water:
 			state_under_water();
 			break;
+		case State.pause_power:
+			PausePower();
+			break;
 		}
 		
 		prev_state = cur_state; 
@@ -216,6 +245,7 @@ public class Kirby : MonoBehaviour {
 			// b input
 			next_state = State.suck;
 		}
+
 	}
 	
 	void state_jump() {
@@ -408,9 +438,20 @@ public class Kirby : MonoBehaviour {
 			change_height (0.75f);
 			box.size = puffed_box_size;
 			next_state = State.stand_enemy;
-		}
+		} 
 		else if (!near_enemy && (Input.GetKeyUp (KeyCode.Z) || Input.GetKeyUp (KeyCode.Comma))) {
 			next_state = State.stand;		
+		} 
+		else if (!near_enemy) {
+			next_state = State.stand;			
+		}
+		if (near_enemy && !set_delay) {
+			suck_usage = Time.time + 4;	
+			set_delay = true;
+		}
+		if (Time.time > suck_usage) {
+			near_enemy = false;	
+			set_delay = false;
 		}
 	}
 	
@@ -563,28 +604,10 @@ public class Kirby : MonoBehaviour {
 						spark_power.poof = true;
 						print ("SPARK");
 						break;
-				case power_type.sing:
-						print ("SING!");
-						if (cur_dir == Direction.right) {
-								sprite_kirby.SetInteger ("Action", 14);
-						} else if (cur_dir == Direction.left) {
-								sprite_kirby.SetInteger ("Action", 15);
-						}
-						GameObject notes = Instantiate (musicNotes) as GameObject;
-						notes.transform.position = transform.position;
-						Attack sing_power = notes.GetComponent<Attack> ();	
-						sing_power.kirby = true;
-						sing_power.go_right = (cur_dir == Direction.right) ? true : false;
-						sing_power.poof = true;
-						cam.music_power = true;
-						GameObject bubble = Instantiate (musicBubble) as GameObject;
-						bubble.transform.position = transform.position;
-						break;
 				}
 			attacking = true;
 		}
 		if (Time.time > attack_usage) {
-			cam.music_power = false;
 			next_state = State.stand_power;
 			set_attack_delay = false;
 		}
@@ -717,21 +740,36 @@ public class Kirby : MonoBehaviour {
 	public void Got_Attacked(){
 		GameObject go = GameObject.Find("godMode");
 		godMode god = go.GetComponent<godMode>();
+
 		if (!god.god_mode) {
 			health--;
 			if (health == 0 && life > 1) {
 				life--;
 				health = 6;
-				Vector3 temp = kirby_spawner.transform.position;
-				temp.z = 0;
-				transform.position = temp;
-				next_state = State.stand;
+				if(cam.cur_level < 4){
+					cam.cur_level = 1;
+				}
+				else{
+					cam.cur_level = 4;
+				}
+				spawn = true;
+//				next_state = State.stand;
 			}
 			if (life == 0 && health == 0) {
 				print ("Game over");
 				gameObject.SetActive (false);
+				Application.LoadLevel(0);
 			}
 		}
+	}
+
+	void PausePower(){
+		if (!set_pause_delay) {
+			pause_usage = Time.time + 5f;
+			set_pause_delay = true;	
+			cam.pause_power = true;
+		}
+		print ("use pause power " + cam.pause_power);
 	}
 	
 	void FixedUpdate(){
