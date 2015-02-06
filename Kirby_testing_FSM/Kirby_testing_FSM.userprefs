@@ -1,17 +1,13 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/PE_Obj.cs">
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../Kirby_copy/Kirby_testing_FSM/Assets/Scripts/Door.cs">
     <Files>
-      <File FileName="Assets/Scripts/Kirby.cs" Line="86" Column="21" />
-      <File FileName="Assets/Scripts/PE_Obj.cs" Line="204" Column="28" />
-      <File FileName="Assets/Scripts/Camera_follow.cs" Line="13" Column="11" />
-      <File FileName="Assets/Scripts/Door.cs" Line="31" Column="35" />
+      <File FileName="../../Kirby_copy/Kirby_testing_FSM/Assets/Scripts/Door.cs" Line="28" Column="19" />
+      <File FileName="../../Kirby_copy/Kirby_testing_FSM/Assets/Scripts/Camera_follow.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/jiexilu/Desktop/W2015/EECS 494/EECS494/Kirby_testing_FSM/Assets/Scripts/PE_Obj.cs" line="90" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>
