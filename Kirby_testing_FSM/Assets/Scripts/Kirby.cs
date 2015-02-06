@@ -57,7 +57,9 @@ public class Kirby : MonoBehaviour {
 	public float water_speed = 2f;
 	public float swim_up_speed = 2f;
 	public bool under_water = false; 
-	public bool at_door = false;
+	public bool going_through_door = false;
+	public float door_delay = 0.05f;
+	public Vector3 next_door_pos;
 	
 	public bool has_enemy = false;
 	public power_type power = power_type.none;
@@ -116,7 +118,24 @@ public class Kirby : MonoBehaviour {
 		//		if (reached_ground) {
 		//			increase_jump = true; 
 		//		}
-		
+
+		if (going_through_door && !set_delay) {
+			print ("Kirby going through door");
+			usage = Time.time + door_delay;
+			set_delay = true; 
+			transform.position = next_door_pos;
+			cur_state = cur_stand;
+			print ("Kirby at position delay " + transform.position);
+			return;
+		} else if (Time.time < usage && going_through_door) {
+			cur_state = cur_stand;
+			print ("Kirby at position wait " + transform.position);
+			return;
+		} else {
+			set_delay = false;
+			going_through_door = false;
+		}
+
 		// input + cur_state = next_state; 
 		switch (cur_state) {
 		case State.stand:
@@ -180,7 +199,7 @@ public class Kirby : MonoBehaviour {
 			sprite_kirby.SetInteger ("Action", 2);
 			cur_dir = Direction.right;
 		} 
-		if ((Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) && !at_door) {
+		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) {
 			// up input
 			next_state = State.inhale; 
 		} 
@@ -477,7 +496,7 @@ public class Kirby : MonoBehaviour {
 			sprite_kirby.SetInteger ("Action", 2);
 			cur_dir = Direction.right;
 		} 
-		if ((Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) && !at_door) {
+		if (Input.GetKey (KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) {
 			// up input
 			next_state = State.inhale; 
 		} 
@@ -681,9 +700,7 @@ public class Kirby : MonoBehaviour {
 			}
 			col.gameObject.SetActive(false);
 			near_enemy = false;
-		} else if (col.gameObject.tag == "door") {
-			at_door = true; 
-		}else if(col.gameObject.tag == "boss" || col.gameObject.tag == "bossPower"){
+		} else if(col.gameObject.tag == "boss" || col.gameObject.tag == "bossPower"){
 			Got_Attacked();
 		}
 	}
@@ -693,9 +710,7 @@ public class Kirby : MonoBehaviour {
 		my_obj = gameObject.GetComponent<PE_Obj> ();
 		if (col.gameObject.tag == "Ground") {
 			my_obj.ground = null;  
-		} else if (col.gameObject.tag == "door") {
-			at_door = false; 
-		}
+		} 
 	}
 	
 	

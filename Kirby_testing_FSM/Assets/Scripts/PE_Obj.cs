@@ -24,6 +24,7 @@ public class PE_Obj : MonoBehaviour {
 	
 	public bool is_under_water = false;
 	BoxCollider box;
+	private float big_difference = 0.5f;
 	
 	
 	void Start() {
@@ -84,23 +85,26 @@ public class PE_Obj : MonoBehaviour {
 		// differences in position
 		float dif_x = 0f;
 		float dif_y = 0f;
-
-		if (col.CompareTag("Ground") && CompareTag("Player")) {
-			print ("I'm colliding with ground");
+		
+		if (col.name == "Cube" && CompareTag("Player")) {
+			print ("I'm colliding with cube");
+			print ("velocity " + vel);
 		}
-
+		
 		// collision up of kirby
 		if (vel.y > 0 && PhysEngine.GEQ(y_up, col_y_down)) {
 			//get new position 
 			dif_y = Mathf.Abs (y_up - col_y_down);
 			//set new position 
-			next_pos.y -= dif_y;
-			//set velocity to zero
-			vel.y = 0f;
+			if (dif_y < big_difference) {
+				next_pos.y -= dif_y;
+				//set velocity to zero
+				vel.y = 0f;
+			}
 		} else if (vel.y <= 0) { // collision on the bottom of kirby
-//			if (CompareTag("Player")) {
-//				print("stop");
-//			}
+			//			if (CompareTag("Player")) {
+			//				print("stop");
+			//			}
 			if (col.CompareTag("Slope")) {
 				Slope_resolution(col);
 			} else if (col.CompareTag("Pool")) {
@@ -114,10 +118,12 @@ public class PE_Obj : MonoBehaviour {
 				//get new position 
 				dif_y = Mathf.Abs (y_down - col_y_up);
 				//set new position 
-				next_pos.y += dif_y;
-				//set velocity to zero
-				vel.y = 0f;
-				ground = col; 
+				if (dif_y < big_difference) {
+					next_pos.y += dif_y;
+					//set velocity to zero
+					vel.y = 0f;
+					ground = col;
+				}
 			}
 		}
 		
@@ -135,10 +141,12 @@ public class PE_Obj : MonoBehaviour {
 				col_dir = Col_dir.right;
 				//get new position 
 				dif_x = Mathf.Abs (x_right - col_x_left);
-				//set new position 
-				next_pos.x -= dif_x;
-				//set velocity to zero
-				vel.x = 0f;
+				if (dif_x < big_difference) {
+					//set new position 
+					next_pos.x -= dif_x;
+					//set velocity to zero
+					vel.x = 0f;
+				}
 			}
 		} else if (vel.x < 0) { 
 			// collision to the left of kirby
@@ -154,20 +162,22 @@ public class PE_Obj : MonoBehaviour {
 				col_dir = Col_dir.left;
 				//get new position 
 				dif_x = Mathf.Abs (x_left - col_x_right);
-				//set new position 
-				next_pos.x += dif_x;
-				//set velocity to zero
-				vel.x = 0f;
+				if (dif_x < big_difference) {
+					//set new position 
+					next_pos.x += dif_x;
+					//set velocity to zero
+					vel.x = 0f;
+				}
 			}
 		} else if (col_x_left == x_right || col_x_right == x_left) {
 			vel.x = 0f; 
 		}
 		
-		float temp = Mathf.Abs(Vector3.Distance(next_pos, cur_pos));
-		if (temp >= 0.5f) {
-			print ("Big difference!!!!");
-			return;
-		}
+		//		float temp = Mathf.Abs(Vector3.Distance(next_pos, cur_pos));
+		//		if (temp >= 0.5f) {
+		//			print ("Big difference!!!!");
+		//			return;
+		//		}
 		cur_pos = next_pos;
 		transform.position = cur_pos;
 	}
@@ -184,7 +194,7 @@ public class PE_Obj : MonoBehaviour {
 		Direction cur_dir;
 		Vector3 BR;
 		Vector3 BL;
-
+		
 		if (CompareTag("Player")) {
 			Kirby kirby = gameObject.GetComponent<Kirby> ();
 			cur_dir = kirby.cur_dir;
@@ -193,6 +203,7 @@ public class PE_Obj : MonoBehaviour {
 		} else {
 			if (!CompareTag("Enemy")) return; // error checking
 			Enemy_1 enemy = gameObject.GetComponent<Enemy_1> ();
+			if (enemy == null) return; 
 			cur_dir = enemy.cur_dir;
 			BR = enemy.BR.position;
 			BL = enemy.BL.position;

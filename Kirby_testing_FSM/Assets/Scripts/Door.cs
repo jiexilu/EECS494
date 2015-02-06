@@ -23,21 +23,25 @@ public class Door : MonoBehaviour {
 			Kirby kirby = col.gameObject.GetComponent<Kirby> ();
 			if((Input.GetKey(KeyCode.UpArrow) || Input.GetKey (KeyCode.W)) 
 			   && (kirby.cur_state == State.stand || kirby.cur_state == State.stand_power)){
+				Camera_follow cam = main_camera.GetComponent<Camera_follow>();
+				cam.cur_level = next_level;
+				if (cam.cur_level == 4) {
+					Application.LoadLevel(2);
+					return;
+				}
+				kirby.going_through_door = true;
 				//Vector3 start = new Vector3(-8.72f,-10.33f, 0f);
 				Vector3 new_pos = doorPort.position; 
 				new_pos.z = 0;
-				col.gameObject.transform.position = new_pos;
+				kirby.transform.position = new_pos;
+				kirby.next_door_pos = new_pos;
+				print ("Kirby now going to position " + new_pos);
 				
 				Vector3 cam_location = doorPort.position;
 				//				cam_location.y = -10.33f;
 				cam_location.z = main_camera.transform.position.z;
 				cam_location.x = -5.067625f;
 				main_camera.transform.position = cam_location;
-				Camera_follow cam = main_camera.GetComponent<Camera_follow>();
-				cam.cur_level = next_level;
-				if (cam.cur_level == 4) {
-					Application.LoadLevel(2);
-				}
 			}
 		}
 	}
