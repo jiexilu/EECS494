@@ -4,11 +4,12 @@ using System.Collections.Generic;
 
 public class Camera_follow : MonoBehaviour {
 
-	public GameObject[] prefabEnemies;
 	public Transform target;
 	public RaycastHit rHit;
 	public int cur_level = 1;
 	public bool music_power = false;
+
+	public  GameObject prof;
 
 	void Awake(){
 
@@ -16,7 +17,6 @@ public class Camera_follow : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
 	}
 	
 	// Update is called once per frame
@@ -51,20 +51,39 @@ public class Camera_follow : MonoBehaviour {
 				if (target.position.y != -5.46f) {
 					tp.y = -5.46f;
 				}
+				if (target.position.x < -4.03f) {
+					tp.x = -4.03f;
+				} else if (target.position.x > 15.54f) {
+					tp.x = 15.54f;	
+				}
 				break;
 			case 5:
 				if (target.position.y != -16.5f) {
 					tp.y = -16.5f;
+				}
+				if (target.position.x < -4.03f) {
+					tp.x = -4.03f;
+				} else if (target.position.x > 15.54f) {
+					tp.x = 15.54f;	
+				}
+				bossProf boss = prof.GetComponent<bossProf>();
+				boss.ready = true;
+				//spawn boss
+				break;
+			case 6:
+				if(target.position.y < -28.23 ){
+					tp.y = target.transform.position.y;
+				}
+				if (target.position.x < -4.03f) {
+					tp.x = -4.03f;
+				} else if (target.position.x > 15.54f) {
+					tp.x = 15.54f;	
 				}
 				break;
 		}
 
 		transform.position = tp;
 
-		//if enemy is off screen is disabled, make them active
-//		prefabEnemies [0].SetActive (true);
-//		prefabEnemies [1].SetActive (true);
-//		prefabEnemies [2].SetActive (true);
 	}
 
 }

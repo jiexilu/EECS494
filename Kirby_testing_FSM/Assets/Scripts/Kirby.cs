@@ -414,7 +414,7 @@ public class Kirby : MonoBehaviour {
 			cur_dir = Direction.right;
 			sprite_kirby.SetInteger ("Action", 16);
 		} 
-		// down input
+		// down input 
 		if (Input.GetKeyDown (KeyCode.DownArrow) || Input.GetKeyDown (KeyCode.S)) {
 			print ("has power" + enemy_power);
 			switch (enemy_power) {
@@ -679,13 +679,12 @@ public class Kirby : MonoBehaviour {
 				Got_Attacked(); 
 				//TODO: i want to call got_attaked in enemy_1 script
 			}
-			if(col.gameObject.tag == "boss"){
-				Got_Attacked();
-			}
 			col.gameObject.SetActive(false);
 			near_enemy = false;
 		} else if (col.gameObject.tag == "door") {
 			at_door = true; 
+		}else if(col.gameObject.tag == "boss" || col.gameObject.tag == "bossPower"){
+			Got_Attacked();
 		}
 	}
 	

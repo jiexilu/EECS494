@@ -75,12 +75,18 @@ public class Attack : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider col){
 		if (kirby) {
-			if (col.tag == "Enemy" && power != power_type.sing) {
+			if (col.tag == "Enemy") {
 				print ("attack");
 				col.gameObject.SetActive (false);
 				if (power == power_type.none) {
 					Destroy (this.gameObject);
 				}
+			}
+			else if(col.tag == "boss"){
+				print ("attack boss");
+				GameObject boss = GameObject.FindGameObjectWithTag("boss");
+				bossProf prof = boss.GetComponent<bossProf>();
+				prof.life--;
 			}
 		} else {
 			if(col.tag == "Player"){
